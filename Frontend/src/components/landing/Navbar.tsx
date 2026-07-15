@@ -3,7 +3,7 @@ import { Link, useLocation } from 'react-router-dom'
 import { cn } from '@/lib/utils'
 import { Button, Link as UILink } from '@/components/ui'
 import { useScrollY } from '@/hooks/useMedia'
-
+import logo from '@/assets/logo.png'
 const navItems = [
   { href: '#product', label: 'Product' },
   { href: '#workflow', label: 'Workflow' },
@@ -45,10 +45,10 @@ export function Navbar() {
         <div className="flex items-center justify-between h-16 lg:h-18">
           <Link
             to="/"
-            className="flex items-center gap-2 font-semibold text-xl text-fg-0 tracking-tight"
+            className="flex items-center gap-4 font-semibold text-xl text-fg-0 tracking-tight"
             aria-label="DataPilot AI Home"
           >
-            <svg
+            {/* <svg
               className="w-7 h-7 text-accent"
               viewBox="0 0 32 32"
               fill="none"
@@ -61,8 +61,13 @@ export function Navbar() {
                 strokeWidth="2.5"
                 strokeLinecap="round"
               />
-            </svg>
-            <span>DataPilot AI</span>
+            </svg> */}
+            {/* <span>DataPilot AI</span> */}
+            <img
+              src={logo}
+              alt="DataPilot AI Logo"
+              className="w-33 h-22 "
+            />
           </Link>
 
           <div

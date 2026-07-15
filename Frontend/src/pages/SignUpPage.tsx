@@ -107,7 +107,7 @@ export function SignUpPage() {
           value={formData.name}
           onChange={handleChange}
           error={errors.name}
-          placeholder="Alex Chen"
+          placeholder="Enter your full name"
           autoComplete="name"
           autoFocus
           disabled={isLoading}
@@ -120,7 +120,7 @@ export function SignUpPage() {
           value={formData.email}
           onChange={handleChange}
           error={errors.email}
-          placeholder="alex@company.com"
+          placeholder="xyz@gmail.com"
           autoComplete="email"
           disabled={isLoading}
         />
