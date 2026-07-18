@@ -7,3 +7,15 @@ export { Link } from './Link'
 export { Separator } from './Separator'
 export { Badge } from './Badge'
 export { RadioGroup, RadioGroupItem } from './RadioGroup'
+export { Avatar } from './Avatar'
+export { ScrollArea } from './ScrollArea'
+export {
+  DropdownMenu,
+  DropdownMenuTrigger,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+  DropdownMenuLabel,
+  DropdownMenuGroup,
+  DropdownMenuShortcut,
+} from './DropdownMenu'

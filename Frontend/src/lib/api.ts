@@ -1,4 +1,3 @@
-
 const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
 
 interface User {
@@ -10,6 +9,24 @@ interface User {
 interface AuthResponse {
   user: User;
   token: string;
+}
+
+interface Project {
+  id: string;
+  user_id: string;
+  name: string;
+  description: string | null;
+  dataset_name: string | null;
+  dataset_path: string | null;
+  dataset_size: number | null;
+  dataset_rows: number | null;
+  dataset_columns: number | null;
+  status: string;
+  favorite: boolean;
+  created_at: string;
+  updated_at: string;
+  owner_name?: string;
+  owner_email?: string;
 }
 
 interface ApiError {
@@ -62,6 +79,42 @@ export const api = {
       return request<User>('/users/me');
     },
   },
+
+  projects: {
+    async getAll(): Promise<Project[]> {
+      return request<Project[]>('/projects');
+    },
+
+    async getById(id: string): Promise<Project> {
+      return request<Project>(`/projects/${id}`);
+    },
+
+    async create(data: Partial<Project>): Promise<Project> {
+      return request<Project>('/projects', {
+        method: 'POST',
+        body: JSON.stringify(data),
+      });
+    },
+
+    async update(id: string, data: Partial<Project>): Promise<Project> {
+      return request<Project>(`/projects/${id}`, {
+        method: 'PUT',
+        body: JSON.stringify(data),
+      });
+    },
+
+    async delete(id: string): Promise<{ success: boolean; message: string }> {
+      return request<{ success: boolean; message: string }>(`/projects/${id}`, {
+        method: 'DELETE',
+      });
+    },
+
+    async toggleFavorite(id: string): Promise<Project> {
+      return request<Project>(`/projects/${id}/favorite`, {
+        method: 'POST',
+      });
+    },
+  },
 };
 
 export function setAuthToken(token: string) {
@@ -79,3 +132,5 @@ export function getAuthToken(): string | null {
 export function isAuthenticated(): boolean {
   return !!getAuthToken();
 }
+
+export type { Project, User, AuthResponse };

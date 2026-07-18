@@ -56,7 +56,7 @@ export function SignInPage() {
     try {
       const response = await api.auth.login(formData.email, formData.password)
       setAuthToken(response.token)
-      navigate('/')
+      navigate('/dashboard')
     } catch (error: unknown) {
       const err = error as { response?: { data?: { error?: string } } }
       const message = err.response?.data?.error || 'Invalid email or password'

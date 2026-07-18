@@ -7,6 +7,14 @@ const multer = require('multer');
 const signup = require('./src/auth/Signup');
 const login = require('./src/auth/Login');
 const authMiddleware = require('./src/auth/authMiddleware');
+const {
+  getProjects,
+  getProjectById,
+  createProject,
+  updateProject,
+  deleteProject,
+  toggleFavorite,
+} = require('./src/projects/Projects');
 
 dotenv.config();
 
@@ -39,6 +47,14 @@ app.post('/api/auth/login', (req, res) => login(req, res, pool));
 app.get('/api/users/me', (req, res, next) => authMiddleware(req, res, next, pool), (req, res) => {
   res.json(req.user);
 });
+
+// Project routes (protected)
+app.get('/api/projects', (req, res, next) => authMiddleware(req, res, next, pool), (req, res) => getProjects(req, res, pool));
+app.get('/api/projects/:id', (req, res, next) => authMiddleware(req, res, next, pool), (req, res) => getProjectById(req, res, pool));
+app.post('/api/projects', (req, res, next) => authMiddleware(req, res, next, pool), (req, res) => createProject(req, res, pool));
+app.put('/api/projects/:id', (req, res, next) => authMiddleware(req, res, next, pool), (req, res) => updateProject(req, res, pool));
+app.delete('/api/projects/:id', (req, res, next) => authMiddleware(req, res, next, pool), (req, res) => deleteProject(req, res, pool));
+app.post('/api/projects/:id/favorite', (req, res, next) => authMiddleware(req, res, next, pool), (req, res) => toggleFavorite(req, res, pool));
 
 app.post('/api/upload', upload.single('file'), (req, res) => {
   if (!req.file) {
