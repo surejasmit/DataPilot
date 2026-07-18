@@ -8,6 +8,7 @@ import { Label } from '@/components/ui/Label'
 import { Button } from '@/components/ui/Button'
 import { Link as UILink } from '@/components/ui/Link'
 import { Loader2, CheckCircle, AlertCircle } from 'lucide-react'
+import { api, setAuthToken } from '@/lib/api'
 
 interface FormErrors {
   email?: string
@@ -53,13 +54,13 @@ export function SignInPage() {
 
     setIsLoading(true)
     try {
-      // TODO: Connect to backend API
-      // await api.auth.login(formData)
-      await new Promise((resolve) => setTimeout(resolve, 1500))
-      // navigate('/dashboard') // Dashboard not implemented yet
+      const response = await api.auth.login(formData.email, formData.password)
+      setAuthToken(response.token)
       navigate('/')
-    } catch {
-      setErrors({ email: 'Invalid email or password' })
+    } catch (error: unknown) {
+      const err = error as { response?: { data?: { error?: string } } }
+      const message = err.response?.data?.error || 'Invalid email or password'
+      setErrors({ email: message })
     } finally {
       setIsLoading(false)
     }

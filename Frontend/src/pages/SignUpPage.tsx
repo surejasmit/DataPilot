@@ -8,6 +8,7 @@ import { Input } from '@/components/ui/Input'
 import { Button } from '@/components/ui/Button'
 import { Link as UILink } from '@/components/ui/Link'
 import { Loader2 } from 'lucide-react'
+import { api, setAuthToken } from '@/lib/api'
 
 interface FormErrors {
   name?: string
@@ -75,12 +76,20 @@ export function SignUpPage() {
 
     setIsLoading(true)
     try {
-      // TODO: Connect to backend API
-      // await api.auth.register(formData)
-      await new Promise((resolve) => setTimeout(resolve, 1500))
+      const { token } = await api.auth.register(
+        formData.name,
+        formData.email,
+        formData.password
+      )
+      setAuthToken(token)
       navigate('/signin?registered=true')
     } catch (err) {
-      setErrors({ email: 'An account with this email already exists' })
+      const message = err instanceof Error ? err.message : 'An error occurred'
+      if (message.includes('email') || message.includes('exists')) {
+        setErrors({ email: 'An account with this email already exists' })
+      } else {
+        setErrors({ email: message })
+      }
     } finally {
       setIsLoading(false)
     }
