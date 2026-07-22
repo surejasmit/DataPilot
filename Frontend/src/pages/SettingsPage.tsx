@@ -374,7 +374,7 @@ function renderSettingsItem(item: SettingItem, index: number) {
       >
         <div className="flex items-center gap-3">
           <div className="w-10 h-10 rounded-lg bg-bg-2 flex items-center justify-center">
-            <item.icon className="w-5 h-5" />
+            {item.icon}
           </div>
           <div>
             <p className="font-medium text-fg-0">{item.label}</p>
@@ -411,7 +411,7 @@ function renderSettingsItem(item: SettingItem, index: number) {
           className={cn(item.type === 'danger' && 'text-error border-error hover:bg-error/10')}
           onClick={() => alert(`${item.label} clicked (demo)`)}
         >
-          {item.icon && <item.icon className="w-4 h-4 mr-1" />}
+          {item.icon}
           {item.action === 'export_data' && 'Export'}
           {item.action === 'delete_account' && 'Delete Account'}
           {item.action === 'enable_2fa' && 'Enable'}

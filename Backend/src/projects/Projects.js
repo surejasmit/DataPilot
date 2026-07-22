@@ -2,7 +2,7 @@ const getProjects = async (req, res, pool) => {
   try {
     const userId = req.user.id;
     const result = await pool.query(
-      `SELECT p.*, 
+      `SELECT p.*,
         u.name as owner_name,
         u.email as owner_email
        FROM projects p

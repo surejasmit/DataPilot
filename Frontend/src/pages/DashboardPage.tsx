@@ -33,6 +33,7 @@ import {
   DollarSign,
   CheckCircle,
   AlertCircle,
+  Star,
 } from 'lucide-react'
 import { Avatar } from '@/components/ui/Avatar'
 import { ThemeToggle } from '@/components/app/ThemeToggle'

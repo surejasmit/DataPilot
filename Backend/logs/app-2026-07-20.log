@@ -1,0 +1,28 @@
+[2026-07-20T07:53:25.036Z] [INFO] Server running on port 5000
+[2026-07-20T07:53:25.157Z] [INFO] Database connected successfully
+[2026-07-20T07:56:04.488Z] [INFO] Server running on port 5000
+[2026-07-20T07:56:04.557Z] [INFO] Database connected successfully
+[2026-07-20T12:00:27.727Z] [INFO] Server running on port 5000
+[2026-07-20T12:00:27.848Z] [INFO] Database connected successfully
+[2026-07-20T12:29:34.405Z] [INFO] Server running on port 5000
+[2026-07-20T12:29:34.495Z] [INFO] Database connected successfully
+[2026-07-20T12:29:54.789Z] [INFO] Server running on port 5000
+[2026-07-20T12:29:54.842Z] [INFO] Database connected successfully
+[2026-07-20T12:31:47.950Z] [INFO] Server running on port 5000
+[2026-07-20T12:31:47.999Z] [INFO] Database connected successfully
+[2026-07-20T12:59:36.909Z] [INFO] Server running on port 5000
+[2026-07-20T12:59:36.958Z] [INFO] Database connected successfully
+[2026-07-20T13:07:06.512Z] [INFO] Upload started {"fileName":"SuperMarket Analysis - SuperMarket Analysis.csv","fileSize":0,"userId":2}
+[2026-07-20T13:07:10.339Z] [INFO] Upload started {"fileName":"SuperMarket Analysis - SuperMarket Analysis.csv","fileSize":0,"userId":2}
+[2026-07-20T13:10:42.475Z] [INFO] Server running on port 5000
+[2026-07-20T13:10:42.529Z] [INFO] Database connected successfully
+[2026-07-20T13:14:42.346Z] [INFO] Server running on port 5000
+[2026-07-20T13:14:42.402Z] [INFO] Database connected successfully
+[2026-07-20T13:15:20.177Z] [INFO] Upload started {"fileName":"Twitter+data+in+sheets.xlsx","fileSize":0,"userId":2}
+[2026-07-20T13:15:20.190Z] [INFO] Upload completed {"fileName":"Twitter+data+in+sheets.xlsx","datasetId":16,"userId":2,"durationMs":12}
+[2026-07-20T13:15:20.192Z] [INFO] Analysis started {"datasetId":16,"userId":2}
+[2026-07-20T13:15:34.525Z] [INFO] Analysis completed {"datasetId":16,"userId":2,"durationMs":14335}
+[2026-07-20T13:25:03.987Z] [INFO] Upload started {"fileName":"sales_data_cars.csv","fileSize":0,"userId":2}
+[2026-07-20T13:25:03.995Z] [INFO] Upload completed {"fileName":"sales_data_cars.csv","datasetId":17,"userId":2,"durationMs":6}
+[2026-07-20T13:25:03.996Z] [INFO] Analysis started {"datasetId":17,"userId":2}
+[2026-07-20T13:25:04.127Z] [INFO] Analysis completed {"datasetId":17,"userId":2,"durationMs":132}

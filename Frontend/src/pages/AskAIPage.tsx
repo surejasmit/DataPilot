@@ -44,6 +44,8 @@ interface Message {
 }
 
 interface SuggestedAction {
+  label: string
+  action: string
 }
 
 const mockMessages: Message[] = [
@@ -129,19 +131,12 @@ export function AskAIPage() {
     setShowSuggestions(false)
     setIsLoading(true)
 
-    // Simulate AI response
-    await new Promise(resolve => setTimeout(resolve, 1500 + Math.random() * 1000))
-
-    const responses = [
-      `I analyzed your question about "${userInput}". Based on the current dataset, here are the key findings...`,
-      `Great question! Let me break down the answer for you...`,
-      `I found some interesting patterns related to "${userInput}". Here's what the data shows...`,
-    ]
+    await new Promise(resolve => setTimeout(resolve, 1500))
 
     const aiMessage: Message = {
       id: `${Date.now()}-ai`,
       role: 'assistant',
-      content: responses[Math.floor(Math.random() * responses.length)],
+      content: `I analyzed your question about "${userInput}". Based on the current dataset, here are the key findings...`,
       timestamp: new Date(),
       suggestedActions: [
         { label: 'Create visualization', action: 'viz' },

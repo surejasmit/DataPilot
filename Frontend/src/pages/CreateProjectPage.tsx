@@ -20,14 +20,19 @@ import {
 } from 'lucide-react'
 import { api } from '@/lib/api'
 
-interface UploadedFile {
+let fileIdCounter = 0
+function nextFileId(): string {
+  fileIdCounter++
+  return `file-${Date.now()}-${fileIdCounter}`
+}
+
+interface UploadedFileEntry {
   id: string
   name: string
   size: number
   type: string
   estimatedRows: number
-  status: 'pending' | 'uploading' | 'complete' | 'error'
-  progress: number
+  file: File
 }
 
 const supportedTypes = [
@@ -45,7 +50,7 @@ const getFileType = (file: File) => {
 }
 
 const estimateRows = (file: File) => {
-  const bytesPerRow = 150 // rough estimate
+  const bytesPerRow = 150
   return Math.round(file.size / bytesPerRow)
 }
 
@@ -53,9 +58,10 @@ export function CreateProjectPage() {
   const navigate = useNavigate()
   const [projectName, setProjectName] = useState('')
   const [description, setDescription] = useState('')
-  const [files, setFiles] = useState<UploadedFile[]>([])
+  const [files, setFiles] = useState<UploadedFileEntry[]>([])
   const [dragActive, setDragActive] = useState(false)
   const [currentStep, setCurrentStep] = useState(1) // 1: details, 2: upload, 3: review
+  const [isCreating, setIsCreating] = useState(false)
   const fileInputRef = useRef<HTMLInputElement>(null)
 
   const handleDrag = useCallback((e: React.DragEvent) => {
@@ -92,39 +98,17 @@ export function CreateProjectPage() {
         return
       }
 
-      const newFile: UploadedFile = {
-        id: `${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
+      const entry: UploadedFileEntry = {
+        id: nextFileId(),
         name: file.name,
         size: file.size,
         type: getFileType(file),
         estimatedRows: estimateRows(file),
-        status: 'pending',
-        progress: 0,
+        file,
       }
 
-      setFiles(prev => [...prev, newFile])
-      simulateUpload(newFile.id)
+      setFiles(prev => [...prev, entry])
     })
-  }
-
-  const simulateUpload = (fileId: string) => {
-    setFiles(prev => prev.map(f => f.id === fileId ? { ...f, status: 'uploading' } : f))
-
-    let progress = 0
-    const interval = setInterval(() => {
-      progress += Math.random() * 15
-      if (progress >= 100) {
-        progress = 100
-        clearInterval(interval)
-        setFiles(prev => prev.map(f =>
-          f.id === fileId ? { ...f, status: 'complete', progress: 100 } : f
-        ))
-      } else {
-        setFiles(prev => prev.map(f => f.id === fileId ? { ...f, progress } : f))
-      }
-    }, 300)
-
-    return () => clearInterval(interval)
   }
 
   const removeFile = (fileId: string) => {
@@ -159,11 +143,10 @@ export function CreateProjectPage() {
       const project = await api.projects.create({
         name: projectName,
         description: description,
-        dataset_name: firstFile.name,
-        dataset_size: firstFile.size,
-        dataset_rows: firstFile.estimatedRows,
-        dataset_columns: firstFile.type === 'CSV' ? 10 : firstFile.type === 'Excel' ? 15 : 8,
       })
+      if (firstFile) {
+        await api.datasets.upload(firstFile.file, project.id)
+      }
       navigate(`/projects/${project.id}`)
     } catch (err) {
       console.error('Failed to create project:', err)
@@ -318,21 +301,7 @@ export function CreateProjectPage() {
                           <span>{file.estimatedRows.toLocaleString()} est. rows</span>
                           <Badge variant="accent" size="sm">{file.type}</Badge>
                         </div>
-                        {file.status === 'uploading' && (
-                          <div className="w-32 h-2 bg-bg-3 rounded-full mt-2 overflow-hidden">
-                            <motion.div
-                              initial={{ width: 0 }}
-                              animate={{ width: `${file.progress}%` }}
-                              className="h-full bg-accent rounded-full"
-                            />
-                          </div>
-                        )}
-                        {file.status === 'complete' && (
-                          <CheckCircle className="w-4 h-4 text-success" />
-                        )}
-                        {file.status === 'error' && (
-                          <AlertCircle className="w-4 h-4 text-error" />
-                        )}
+
                       </div>
                       <Button
                         variant="ghost"
@@ -392,7 +361,7 @@ export function CreateProjectPage() {
                         <Badge variant="accent" size="sm">{file.type}</Badge>
                       </div>
                       <dd className="text-fg-2 text-xs mt-1">
-                        {formatBytes(file.size)} • ~{file.estimatedRows.toLocaleString()} rows • {file.status}
+                        {formatBytes(file.size)} • ~{file.estimatedRows.toLocaleString()} rows
                       </dd>
                     </div>
                   ))}

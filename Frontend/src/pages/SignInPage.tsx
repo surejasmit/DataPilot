@@ -58,8 +58,7 @@ export function SignInPage() {
       setAuthToken(response.token)
       navigate('/dashboard')
     } catch (error: unknown) {
-      const err = error as { response?: { data?: { error?: string } } }
-      const message = err.response?.data?.error || 'Invalid email or password'
+      const message = error instanceof Error ? error.message : 'Invalid email or password'
       setErrors({ email: message })
     } finally {
       setIsLoading(false)
@@ -82,7 +81,7 @@ export function SignInPage() {
         <div className="mt-8 p-4 bg-bg-1 border border-border-1 rounded-xl">
           <p className="text-sm text-fg-1">
             <strong className="text-fg-0">Demo credentials:</strong><br />
-            Email: demo@datapilot.ai<br />
+            Email: example@gmail.com<br />
             Password: DemoPass123
           </p>
         </div>
@@ -108,7 +107,7 @@ export function SignInPage() {
           value={formData.email}
           onChange={handleChange}
           error={errors.email}
-          placeholder="alex@company.com"
+          placeholder="example@gmail.com"
           autoComplete="email"
           autoFocus
           disabled={isLoading}
