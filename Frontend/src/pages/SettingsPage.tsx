@@ -117,13 +117,15 @@ export function SettingsPage() {
   return (
     <div className="space-y-6 animate-fade-in max-w-4xl">
       {/* Header */}
-      <div>
-        <h1 className="text-3xl font-light text-fg-0 tracking-tight flex items-center gap-2">
-          <Settings className="w-7 h-7 text-accent" />
-          Settings
-        </h1>
-        <p className="text-fg-1 mt-1">Manage your account preferences and configuration</p>
-      </div>
+      <section>
+        <div className="mb-6">
+          <h1 className="text-2xl font-semibold text-fg-0 tracking-tight flex items-center gap-2">
+            <Settings className="w-6 h-6 text-accent" />
+            Settings
+          </h1>
+          <p className="text-sm text-fg-2 mt-1">Manage your account preferences and configuration</p>
+        </div>
+      </section>
 
       <div className="flex gap-6">
         {/* Sidebar Navigation */}

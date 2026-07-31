@@ -2,30 +2,56 @@ const analysisService = require('../services/analysis.service');
 
 const getAnalysis = async (req, res) => {
   try {
-    const { projectId } = req.params;
-    const parsedId = parseInt(projectId);
-    if (isNaN(parsedId)) {
+    const projectId = parseInt(req.params.projectId);
+    if (isNaN(projectId)) {
       return res.status(400).json({ error: 'Invalid project ID' });
     }
 
-    const result = await analysisService.getAnalysis(parsedId, req.user.id);
-    if (!result) {
+    const analysis = await analysisService.getAnalysisByProjectId(projectId, req.user.id);
+    if (!analysis) {
       return res.status(404).json({ error: 'Project not found' });
     }
 
-    res.json(result);
+    res.json(analysis);
   } catch (err) {
-    res.status(500).json({ error: 'Failed to generate analysis', details: err.message });
+    console.error('Get analysis error:', err);
+    res.status(500).json({ error: 'Failed to fetch analysis data', details: err.message });
   }
 };
 
 const getAllInsights = async (req, res) => {
   try {
-    const result = await analysisService.getAllInsights(req.user.id);
-    res.json(result);
+    const insights = await analysisService.getAllInsights(req.user.id);
+    res.json(insights);
   } catch (err) {
-    res.status(500).json({ error: 'Failed to fetch insights', details: err.message });
+    console.error('Get all insights error:', err);
+    res.status(500).json({ error: 'Failed to fetch insights' });
   }
 };
 
-module.exports = { getAnalysis, getAllInsights };
+const exportReport = async (req, res) => {
+  try {
+    const projectId = parseInt(req.params.projectId);
+    if (isNaN(projectId)) {
+      return res.status(400).json({ error: 'Invalid project ID' });
+    }
+
+    const result = await analysisService.exportReport(projectId, req.user.id);
+    if (!result) {
+      return res.status(404).json({ error: 'Project not found or no dataset uploaded' });
+    }
+
+    res.setHeader('Content-Type', 'application/pdf');
+    res.setHeader('Content-Disposition', `attachment; filename="${result.filename}"`);
+    res.send(result.buffer);
+  } catch (err) {
+    console.error('Export report error:', err);
+    res.status(500).json({ error: 'Failed to generate report', details: err.message });
+  }
+};
+
+module.exports = {
+  getAnalysis,
+  getAllInsights,
+  exportReport,
+};

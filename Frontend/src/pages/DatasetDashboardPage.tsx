@@ -9,7 +9,7 @@ import { api, Project, DatasetPreview, AnalysisData } from '@/lib/api'
 import {
   Database, FileSpreadsheet, Rows3, Columns3, AlertTriangle, AlertCircle, CheckCircle2,
   Table2, Info, ArrowUpDown, Search, ChevronLeft, ChevronRight,
-  Loader2, BarChart3, Activity, Hash, Type, Calendar,
+  Loader2, BarChart3, Activity, Hash, Type, Calendar, Download,
   Trash2, Sparkles, FileText, RefreshCw, ShieldAlert,
   X, Check, Settings2, Braces, TrendingUp,
   ClipboardCheck, ClipboardX, PieChart, ScatterChart, LineChart
@@ -25,13 +25,6 @@ const chartIcons: Record<string, any> = {
   line: LineChart,
   heatmap: Activity,
   boxplot: Activity,
-}
-
-const severityColors: Record<string, string> = {
-  critical: 'bg-error-bg/20 border-error/30 text-error',
-  warning: 'bg-warning-bg/20 border-warning/30 text-warning',
-  info: 'bg-info-bg/20 border-info/30 text-info',
-  success: 'bg-success-bg/20 border-success/30 text-success',
 }
 
 export function DatasetDashboardPage() {
@@ -53,10 +46,15 @@ export function DatasetDashboardPage() {
   const [confirmDialog, setConfirmDialog] = useState<{ issue: any; operation: string; label: string } | null>(null)
   const [confirmCleanDialog, setConfirmCleanDialog] = useState<{ operation: string } | null>(null)
   const [cleaningHistory, setCleaningHistory] = useState<any[]>([])
+  const [exporting, setExporting] = useState(false)
 
-  const loadAnalysis = useCallback(async () => {
+  const hasDataset = !!project?.dataset_name
+  const isAnalyzing = analysis?.status === 'UPLOADING' || analysis?.status === 'ANALYZING' || project?.status === 'UPLOADING' || project?.status === 'ANALYZING'
+  const isFailed = analysis?.status === 'FAILED' || project?.status === 'FAILED'
+
+  const loadAnalysis = useCallback(async (isRefresh = false) => {
     if (!id) return
-    setLoading(true)
+    if (!isRefresh) setLoading(true)
     setError(null)
     try {
       const projectData = await api.projects.getById(id)
@@ -64,26 +62,28 @@ export function DatasetDashboardPage() {
       if (projectData.dataset_name) {
         const analysisData = await api.analysis.get(id)
         setAnalysis(analysisData)
-        const previewData = await api.datasets.getPreview(id, previewPage, previewLimit, previewSearch, previewSortCol, previewSortOrder)
-        setPreview(previewData)
+        if (!isRefresh) {
+          const previewData = await api.datasets.getPreview(id, 1, previewLimit, '', '', 'asc')
+          setPreview(previewData)
+        }
       }
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to load analysis')
     } finally {
-      setLoading(false)
+      if (!isRefresh) setLoading(false)
     }
-  }, [id])
+  }, [id, previewLimit])
 
   const loadPreview = useCallback(async () => {
-    if (!id || !project?.dataset_name) return
+    if (!id || !hasDataset) return
     try {
       const data = await api.datasets.getPreview(id, previewPage, previewLimit, previewSearch, previewSortCol, previewSortOrder)
       setPreview(data)
     } catch { /* ignore */ }
-  }, [id, previewPage, previewLimit, previewSearch, previewSortCol, previewSortOrder, project])
+  }, [id, hasDataset, previewPage, previewLimit, previewSearch, previewSortCol, previewSortOrder])
 
   const loadQualityReport = useCallback(async () => {
-    if (!id || !project?.dataset_name) return
+    if (!id || !hasDataset) return
     setQualityLoading(true)
     try {
       await api.datasets.getQualityReport(id)
@@ -98,7 +98,7 @@ export function DatasetDashboardPage() {
     } finally {
       setQualityLoading(false)
     }
-  }, [id, project])
+  }, [id, hasDataset])
 
   const loadCleaningHistory = useCallback(async () => {
     if (!id) return
@@ -109,8 +109,20 @@ export function DatasetDashboardPage() {
   }, [id])
 
   useEffect(() => { loadAnalysis() }, [loadAnalysis])
-  useEffect(() => { if (project?.dataset_name) loadPreview() }, [loadPreview])
-  useEffect(() => { if (project?.dataset_name) { loadQualityReport(); loadCleaningHistory() } }, [project, loadQualityReport, loadCleaningHistory])
+  useEffect(() => { if (hasDataset) loadPreview() }, [loadPreview, hasDataset])
+  useEffect(() => { if (hasDataset) { loadQualityReport(); loadCleaningHistory() } }, [hasDataset, loadQualityReport, loadCleaningHistory])
+
+  useEffect(() => {
+    let interval: any
+    if (isAnalyzing) {
+      interval = setInterval(() => {
+        loadAnalysis(true)
+      }, 3000)
+    }
+    return () => {
+      if (interval) clearInterval(interval)
+    }
+  }, [isAnalyzing, loadAnalysis])
 
   const handleConfirmCleaning = async () => {
     if (confirmDialog && id) {
@@ -120,7 +132,7 @@ export function DatasetDashboardPage() {
       } catch { /* ignore */ }
       setCleaningLoading(null)
       setConfirmDialog(null)
-      loadAnalysis()
+      loadAnalysis(true)
       loadQualityReport()
       loadCleaningHistory()
     }
@@ -138,9 +150,31 @@ export function DatasetDashboardPage() {
       } catch { /* ignore */ }
       setCleaningLoading(null)
       setConfirmCleanDialog(null)
-      loadAnalysis()
+      loadAnalysis(true)
       loadQualityReport()
       loadCleaningHistory()
+    }
+  }
+
+  const handleExportReport = async () => {
+    if (!id) return
+    setExporting(true)
+    try {
+      const blob = await api.analysis.exportReport(id)
+      const url = window.URL.createObjectURL(blob)
+      const a = document.createElement('a')
+      a.href = url
+      a.download = `${project?.name || 'report'}_report.pdf`
+      document.body.appendChild(a)
+      a.click()
+      setTimeout(() => {
+        window.URL.revokeObjectURL(url)
+        a.remove()
+      }, 1000)
+    } catch (err) {
+      alert(err instanceof Error ? err.message : 'Failed to export report')
+    } finally {
+      setExporting(false)
     }
   }
 
@@ -168,7 +202,7 @@ export function DatasetDashboardPage() {
       <div className="flex items-center justify-center min-h-[60vh]">
         <div className="text-center">
           <Loader2 className="w-8 h-8 animate-spin text-accent mx-auto" />
-          <p className="mt-3 text-fg-2">Loading analysis...</p>
+          <p className="mt-3 text-sm text-fg-2">Loading analysis...</p>
         </div>
       </div>
     )
@@ -178,9 +212,9 @@ export function DatasetDashboardPage() {
     return (
       <div className="flex items-center justify-center min-h-[60vh]">
         <Card variant="outlined" className="p-8 max-w-md w-full text-center border-error/30 bg-error-bg/10">
-          <AlertCircle className="w-12 h-12 text-error mx-auto mb-4" />
-          <h3 className="text-lg font-medium text-fg-0 mb-2">Error Loading Analysis</h3>
-          <p className="text-fg-2 mb-4">{error}</p>
+          <AlertCircle className="w-10 h-10 text-error mx-auto mb-3" />
+          <h3 className="text-base font-medium text-fg-0 mb-2">Error Loading Analysis</h3>
+          <p className="text-sm text-fg-2 mb-4">{error}</p>
           <Button onClick={loadAnalysis}><RefreshCw className="w-4 h-4 mr-2" />Retry</Button>
         </Card>
       </div>
@@ -191,9 +225,9 @@ export function DatasetDashboardPage() {
     return (
       <div className="flex items-center justify-center min-h-[60vh]">
         <Card variant="outlined" className="p-8 max-w-md w-full text-center">
-          <Database className="w-12 h-12 text-fg-3 mx-auto mb-4" />
-          <h3 className="text-lg font-medium text-fg-0 mb-2">Project Not Found</h3>
-          <p className="text-fg-2 mb-4">The requested project does not exist.</p>
+          <Database className="w-10 h-10 text-fg-3 mx-auto mb-3" />
+          <h3 className="text-base font-medium text-fg-0 mb-2">Project Not Found</h3>
+          <p className="text-sm text-fg-2 mb-4">The requested project does not exist.</p>
           <Button onClick={() => navigate('/projects')}>Back to Projects</Button>
         </Card>
       </div>
@@ -201,28 +235,38 @@ export function DatasetDashboardPage() {
   }
 
   return (
-    <div className="space-y-6 animate-fade-in">
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-        <div>
-          <div className="flex items-center gap-3">
-            <h1 className="text-2xl font-light text-fg-0">{project.name}</h1>
-            <Badge className={project.status === 'READY' || project.status === 'completed' ? 'bg-success-bg text-success' : project.status === 'ANALYZING' || project.status === 'processing' ? 'bg-warning-bg text-warning' : 'bg-info-bg text-info'}>{project.status}</Badge>
+    <div className="space-y-5 animate-fade-in">
+      <section>
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+          <div>
+            <div className="flex items-center gap-3">
+              <h1 className="text-xl font-semibold text-fg-0">{project.name}</h1>
+              <Badge className={project.status === 'READY' || project.status === 'completed' ? 'bg-success-bg text-success' : project.status === 'ANALYZING' || project.status === 'processing' ? 'bg-warning-bg text-warning' : 'bg-info-bg text-info'}>{project.status}</Badge>
+            </div>
+            <p className="text-sm text-fg-2 mt-1">{project.dataset_name || 'No dataset uploaded'}</p>
           </div>
-          <p className="text-fg-2 mt-1">{project.dataset_name || 'No dataset uploaded'}</p>
+          <div className="flex gap-2">
+            {project.dataset_name && (
+              <>
+                <Button variant="outline" size="sm" onClick={handleExportReport} disabled={exporting}>
+                  {exporting ? (
+                    <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                  ) : (
+                    <Download className="w-4 h-4 mr-2" />
+                  )}
+                  {exporting ? 'Generating...' : 'Export Report'}
+                </Button>
+                <Button variant="outline" size="sm" onClick={() => navigate(`/projects/${id}/insights`)}>
+                  <Sparkles className="w-4 h-4 mr-2" />Insights
+                </Button>
+                <Button variant="outline" size="sm" onClick={() => { loadAnalysis(true); loadQualityReport(); loadCleaningHistory() }}>
+                  <RefreshCw className="w-4 h-4 mr-2" />Refresh
+                </Button>
+              </>
+            )}
+          </div>
         </div>
-        <div className="flex gap-2">
-          {project.dataset_name && (
-            <>
-              <Button variant="outline" size="sm" onClick={() => navigate(`/projects/${id}/insights`)}>
-                <Sparkles className="w-4 h-4 mr-2" />Insights
-              </Button>
-              <Button variant="outline" size="sm" onClick={() => { loadAnalysis(); loadQualityReport(); loadCleaningHistory() }}>
-                <RefreshCw className="w-4 h-4 mr-2" />Refresh
-              </Button>
-            </>
-          )}
-        </div>
-      </div>
+      </section>
 
       {!project.dataset_name || analysis?.status === 'no_dataset' ? (
         <Card variant="outlined" className="p-12 text-center">
@@ -235,13 +279,34 @@ export function DatasetDashboardPage() {
         </Card>
       ) : (
         <>
+          {(analysis?.status === 'UPLOADING' || analysis?.status === 'ANALYZING' || project?.status === 'UPLOADING' || project?.status === 'ANALYZING') && (
+            <div className="p-4 bg-warning-bg/20 border border-warning/30 rounded-xl flex items-center gap-3 mb-4 animate-pulse">
+              <Loader2 className="w-5 h-5 text-warning animate-spin flex-shrink-0" />
+              <div>
+                <p className="text-sm font-medium text-warning">Dataset Analysis in Progress...</p>
+                <p className="text-xs text-fg-2">Python ML service is analyzing rows, columns, data types, and statistics. Page will update automatically when complete.</p>
+              </div>
+            </div>
+          )}
+          {(analysis?.status === 'FAILED' || project?.status === 'FAILED') && (
+            <div className="p-4 bg-error-bg/20 border border-error/30 rounded-xl flex items-center gap-3 mb-4">
+              <AlertCircle className="w-5 h-5 text-error flex-shrink-0" />
+              <div className="flex-1">
+                <p className="text-sm font-medium text-error">Dataset Analysis Failed</p>
+                <p className="text-xs text-fg-2">The ML service encountered an error while analyzing the dataset. Please try refreshing or re-uploading.</p>
+              </div>
+              <Button variant="outline" size="sm" onClick={() => loadAnalysis(true)}>
+                <RefreshCw className="w-4 h-4 mr-1" />Retry
+              </Button>
+            </div>
+          )}
           {analysis?.datasetSummary && (
-            <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}>
-              <Card variant="elevated" className="p-5">
-                <h2 className="text-lg font-semibold text-fg-0 mb-4 flex items-center gap-2">
-                  <Info className="w-5 h-5 text-accent" /> Dataset Summary
+            <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }}>
+              <Card variant="elevated" className="p-4">
+                <h2 className="text-xs font-semibold text-fg-3 uppercase tracking-wider mb-3 flex items-center gap-2">
+                  <Info className="w-3.5 h-3.5 text-accent" /> Dataset Summary
                 </h2>
-                <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-4">
+                <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-6 gap-3">
                   <ProfileCard label="Dataset Name" value={analysis.datasetSummary.datasetName || 'N/A'} icon={FileText} />
                   <ProfileCard label="Dataset Size" value={analysis.datasetSummary.datasetSize ? `${(analysis.datasetSummary.datasetSize / 1024 / 1024).toFixed(2)} MB` : 'N/A'} icon={Database} />
                   <ProfileCard label="Rows" value={analysis.datasetSummary.totalRows?.toLocaleString() || '0'} icon={Rows3} />
@@ -263,8 +328,8 @@ export function DatasetDashboardPage() {
             <div className="flex border-b border-border-1 overflow-x-auto">
               {([
                 { key: 'preview' as Tab, label: 'Data Preview', icon: Table2 },
-                { key: 'columns' as Tab, label: 'Column Info', icon: Columns3 },
-                { key: 'quality' as Tab, label: 'Quality Report', icon: ShieldAlert },
+                { key: 'columns' as Tab, label: 'Columns', icon: Columns3 },
+                { key: 'quality' as Tab, label: 'Quality', icon: ShieldAlert },
                 { key: 'charts' as Tab, label: 'Charts', icon: BarChart3 },
                 { key: 'cleaning' as Tab, label: 'Cleaning', icon: Settings2 },
               ]).map(tab => (
@@ -272,7 +337,7 @@ export function DatasetDashboardPage() {
                   key={tab.key}
                   onClick={() => setActiveTab(tab.key)}
                   className={cn(
-                    'flex items-center gap-2 px-4 py-3 text-sm font-medium transition-colors border-b-2 whitespace-nowrap',
+                    'flex items-center gap-2 px-4 py-2.5 text-sm font-medium transition-colors border-b-2 whitespace-nowrap',
                     activeTab === tab.key ? 'border-accent text-accent' : 'border-transparent text-fg-2 hover:text-fg-0'
                   )}
                 >
@@ -287,19 +352,19 @@ export function DatasetDashboardPage() {
                 {activeTab === 'preview' && (
                   <motion.div key="preview" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}>
                     <div className="flex flex-col sm:flex-row gap-3 mb-4">
-                      <div className="relative flex-1 max-w-md">
+                      <div className="relative flex-1 max-w-sm">
                         <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-fg-3" />
                         <Input
                           placeholder="Search data..."
                           value={previewSearch}
                           onChange={e => { setPreviewSearch(e.target.value); setPreviewPage(1) }}
-                          className="pl-10"
+                          className="pl-9 h-9"
                         />
                       </div>
                       <select
                         value={previewLimit}
                         onChange={e => { setPreviewLimit(parseInt(e.target.value)); setPreviewPage(1) }}
-                        className="px-3 py-2 bg-bg-2 border border-border-1 text-fg-0 rounded-lg text-sm"
+                        className="px-3 py-1.5 bg-bg-2 border border-border-1 text-fg-0 rounded-lg text-xs"
                       >
                         <option value={10}>10 rows</option>
                         <option value={20}>20 rows</option>
@@ -311,10 +376,10 @@ export function DatasetDashboardPage() {
                     {preview && preview.rows.length > 0 ? (
                       <>
                         <div className="overflow-x-auto border border-border-1 rounded-lg">
-                          <table className="w-full">
+                          <table className="w-full text-xs">
                             <thead>
                               <tr className="bg-bg-2">
-                                <th className="px-3 py-2 text-left text-xs font-medium text-fg-2">#</th>
+                                <th className="px-3 py-2 text-left text-fg-3 font-medium">#</th>
                                 {Object.keys(preview.rows[0]).map(col => (
                                   <th
                                     key={col}
@@ -380,16 +445,16 @@ export function DatasetDashboardPage() {
                 {activeTab === 'columns' && (
                   <motion.div key="columns" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}>
                     <div className="overflow-x-auto border border-border-1 rounded-lg">
-                      <table className="w-full">
+                      <table className="w-full text-xs">
                         <thead>
                           <tr className="bg-bg-2">
-                            <th className="px-4 py-3 text-left text-xs font-medium text-fg-2 uppercase">Column Name</th>
-                            <th className="px-4 py-3 text-left text-xs font-medium text-fg-2 uppercase">Detected Type</th>
-                            <th className="px-4 py-3 text-left text-xs font-medium text-fg-2 uppercase">Examples</th>
-                            <th className="px-4 py-3 text-right text-xs font-medium text-fg-2 uppercase">Unique Values</th>
-                            <th className="px-4 py-3 text-right text-xs font-medium text-fg-2 uppercase">Null Count</th>
-                            <th className="px-4 py-3 text-right text-xs font-medium text-fg-2 uppercase">Null %</th>
-                            <th className="px-4 py-3 text-center text-xs font-medium text-fg-2 uppercase">Type</th>
+                            <th className="px-4 py-2.5 text-left text-fg-3 font-medium uppercase">Column Name</th>
+                            <th className="px-4 py-2.5 text-left text-fg-3 font-medium uppercase">Detected Type</th>
+                            <th className="px-4 py-2.5 text-left text-fg-3 font-medium uppercase">Examples</th>
+                            <th className="px-4 py-2.5 text-right text-fg-3 font-medium uppercase">Unique Values</th>
+                            <th className="px-4 py-2.5 text-right text-fg-3 font-medium uppercase">Null Count</th>
+                            <th className="px-4 py-2.5 text-right text-fg-3 font-medium uppercase">Null %</th>
+                            <th className="px-4 py-2.5 text-center text-fg-3 font-medium uppercase">Type</th>
                           </tr>
                         </thead>
                         <tbody className="divide-y divide-border-1">
@@ -433,20 +498,20 @@ export function DatasetDashboardPage() {
                       <div className="space-y-4">
                         <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
                           <div className="p-3 bg-bg-2 rounded-lg text-center">
-                            <p className="text-2xl font-semibold text-fg-0">{analysis.dataQuality.totalRows?.toLocaleString()}</p>
-                            <p className="text-xs text-fg-2">Total Rows</p>
+                            <p className="text-xl font-semibold text-fg-0">{analysis.dataQuality.totalRows?.toLocaleString()}</p>
+                            <p className="text-[11px] text-fg-3">Total Rows</p>
                           </div>
                           <div className="p-3 bg-bg-2 rounded-lg text-center">
-                            <p className={cn('text-2xl font-semibold', analysis.dataQuality.missingValues > 0 ? 'text-warning' : 'text-success')}>{analysis.dataQuality.missingValues}</p>
-                            <p className="text-xs text-fg-2">Missing Values</p>
+                            <p className={cn('text-xl font-semibold', analysis.dataQuality.missingValues > 0 ? 'text-warning' : 'text-success')}>{analysis.dataQuality.missingValues}</p>
+                            <p className="text-[11px] text-fg-3">Missing Values</p>
                           </div>
                           <div className="p-3 bg-bg-2 rounded-lg text-center">
-                            <p className={cn('text-2xl font-semibold', analysis.dataQuality.duplicateRows > 0 ? 'text-warning' : 'text-success')}>{analysis.dataQuality.duplicateRows}</p>
-                            <p className="text-xs text-fg-2">Duplicate Rows</p>
+                            <p className={cn('text-xl font-semibold', analysis.dataQuality.duplicateRows > 0 ? 'text-warning' : 'text-success')}>{analysis.dataQuality.duplicateRows}</p>
+                            <p className="text-[11px] text-fg-3">Duplicate Rows</p>
                           </div>
                           <div className="p-3 bg-bg-2 rounded-lg text-center">
-                            <p className="text-2xl font-semibold text-fg-0">{analysis.issues?.length || 0}</p>
-                            <p className="text-xs text-fg-2">Issues Found</p>
+                            <p className="text-xl font-semibold text-fg-0">{analysis.issues?.length || 0}</p>
+                            <p className="text-[11px] text-fg-3">Issues Found</p>
                           </div>
                         </div>
 
@@ -517,20 +582,17 @@ export function DatasetDashboardPage() {
                 {activeTab === 'charts' && (
                   <motion.div key="charts" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}>
                     {analysis?.chartRecommendations && analysis.chartRecommendations.length > 0 ? (
-                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                         {analysis.chartRecommendations.map((rec, i) => {
                           const Icon = chartIcons[rec.type] || BarChart3
                           return (
-                            <Card key={i} variant="outlined" className="p-4 hover:border-accent/30 transition-all">
-                              <div className="flex items-center gap-2 mb-3">
+                            <Card key={i} variant="outlined" className="p-3 hover:border-accent/30 transition-all">
+                              <div className="flex items-center gap-2 mb-2">
                                 <Badge variant="accent" size="sm">{rec.type}</Badge>
                                 <span className="text-sm font-medium text-fg-0">{rec.title}</span>
                               </div>
-                              <div className="h-32 flex items-center justify-center bg-bg-2 rounded-lg mb-3">
-                                <div className="text-center">
-                                  <Icon className="w-12 h-12 text-accent/60 mx-auto mb-2" />
-                                  <p className="text-xs text-fg-3">{rec.type} visualization</p>
-                                </div>
+                              <div className="h-24 flex items-center justify-center bg-bg-2 rounded-lg mb-2">
+                                <Icon className="w-8 h-8 text-accent/50" />
                               </div>
                               <p className="text-xs text-fg-2 mb-2">{rec.reason}</p>
                               <div className="flex flex-wrap gap-1">
@@ -567,23 +629,23 @@ export function DatasetDashboardPage() {
                           <button
                             key={item.op}
                             onClick={() => executeCleaning(item.op)}
-                            className="p-4 bg-bg-2 border border-border-1 rounded-xl text-center hover:border-accent/50 transition-all group"
+                            className="p-3 bg-bg-2 border border-border-1 rounded-xl text-center hover:border-accent/50 transition-all group"
                           >
-                            <item.icon className="w-6 h-6 text-accent mx-auto mb-2 group-hover:scale-110 transition-transform" />
-                            <p className="text-sm font-medium text-fg-0">{item.label}</p>
+                            <item.icon className="w-5 h-5 text-accent mx-auto mb-1.5 group-hover:scale-110 transition-transform" />
+                            <p className="text-xs font-medium text-fg-0">{item.label}</p>
                           </button>
                         ))}
                       </div>
 
                       {cleaningHistory.length > 0 && (
                         <div>
-                          <h3 className="text-sm font-medium text-fg-0 mb-3">Cleaning History</h3>
-                          <div className="space-y-2">
+                          <h3 className="text-xs font-semibold text-fg-3 uppercase tracking-wider mb-2">Cleaning History</h3>
+                          <div className="space-y-1.5">
                             {cleaningHistory.map((h: any) => (
-                              <div key={h.id} className="flex items-center justify-between p-3 bg-bg-2 rounded-lg">
+                              <div key={h.id} className="flex items-center justify-between p-2.5 bg-bg-2 rounded-lg text-xs">
                                 <div>
-                                  <p className="text-sm text-fg-0">{h.operation.replace(/_/g, ' ')}</p>
-                                  <p className="text-xs text-fg-2">{new Date(h.created_at).toLocaleString()}</p>
+                                  <p className="text-fg-0">{h.operation.replace(/_/g, ' ')}</p>
+                                  <p className="text-fg-3 text-[11px]">{new Date(h.created_at).toLocaleString()}</p>
                                 </div>
                                 <Badge variant={h.status === 'confirmed' ? 'success' : h.status === 'pending' ? 'warning' : 'default'} size="sm">{h.status}</Badge>
                               </div>
@@ -728,10 +790,10 @@ export function DatasetDashboardPage() {
 
 function ProfileCard({ label, value, icon: Icon, severity }: { label: string; value: string; icon: any; severity?: 'warning' | 'success' | 'info' }) {
   return (
-    <div className="p-3 bg-bg-2 rounded-lg">
-      <div className="flex items-center gap-2 mb-1">
-        <Icon className={cn('w-3.5 h-3.5', severity === 'warning' ? 'text-warning' : severity === 'success' ? 'text-success' : 'text-accent')} />
-        <p className="text-xs text-fg-2 truncate">{label}</p>
+    <div className="p-2.5 bg-bg-2 rounded-lg">
+      <div className="flex items-center gap-1.5 mb-1">
+        <Icon className={cn('w-3 h-3', severity === 'warning' ? 'text-warning' : severity === 'success' ? 'text-success' : 'text-accent')} />
+        <p className="text-[11px] text-fg-3 truncate">{label}</p>
       </div>
       <p className="text-sm font-semibold text-fg-0 truncate">{value}</p>
     </div>

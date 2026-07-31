@@ -30,5 +30,6 @@ router.get('/:id/cleaning', auth, datasetController.getCleaningHistory);
 router.post('/:id/cleaning/confirm', auth, datasetController.confirmCleaning);
 router.get('/:id/insights', auth, datasetController.getInsightsForDataset);
 router.post('/:id/insights', auth, datasetController.generateInsightsNow);
+router.post('/:id/question', auth, datasetController.askQuestion);
 
 module.exports = router;

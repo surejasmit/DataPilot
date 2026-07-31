@@ -1,6 +1,14 @@
-import React, { forwardRef } from 'react'
+import React, { forwardRef, createContext, useContext } from 'react'
 import * as RadioGroupPrimitive from '@radix-ui/react-radio-group'
 import { cn } from '@/lib/utils'
+
+interface RadioGroupContextValue {
+  groupValue: string
+  onValueChange: (value: string) => void
+  name: string
+}
+
+const RadioGroupContext = createContext<RadioGroupContextValue | null>(null)
 
 interface RadioGroupProps {
   value: string
@@ -20,12 +28,9 @@ const RadioGroup = forwardRef<HTMLFieldSetElement, RadioGroupProps>(
       {...props}
     >
       <legend className="sr-only">{name}</legend>
-      {React.Children.map(children, (child) => {
-        if (React.isValidElement(child)) {
-          return React.cloneElement(child, { value, onValueChange, name })
-        }
-        return child
-      })}
+      <RadioGroupContext.Provider value={{ groupValue: value, onValueChange, name }}>
+        {children}
+      </RadioGroupContext.Provider>
     </RadioGroupPrimitive.Root>
   )
 )
@@ -34,16 +39,17 @@ RadioGroup.displayName = 'RadioGroup'
 
 interface RadioGroupItemProps {
   value: string
-  children: React.ReactNode
+  children?: React.ReactNode
   className?: string
 }
 
 const RadioGroupItem = forwardRef<HTMLInputElement, RadioGroupItemProps>(
-  ({ className, value, children, name, value: groupValue, onValueChange, ...props }, ref) => {
-    const checked = groupValue === value
+  ({ className, value, children, ...props }, ref) => {
+    const context = useContext(RadioGroupContext)
+    const checked = context?.groupValue === value
 
     const handleChange = () => {
-      onValueChange?.(value)
+      context?.onValueChange(value)
     }
 
     return (
@@ -51,7 +57,7 @@ const RadioGroupItem = forwardRef<HTMLInputElement, RadioGroupItemProps>(
         <input
           ref={ref}
           type="radio"
-          name={name}
+          name={context?.name}
           checked={checked}
           onChange={handleChange}
           className={cn(
@@ -63,9 +69,11 @@ const RadioGroupItem = forwardRef<HTMLInputElement, RadioGroupItemProps>(
           )}
           {...props}
         />
-        <div className="flex-1 min-w-0">
-          <span className="block text-sm font-medium text-fg-0">{children}</span>
-        </div>
+        {children && (
+          <div className="flex-1 min-w-0">
+            <span className="block text-sm font-medium text-fg-0">{children}</span>
+          </div>
+        )}
       </label>
     )
   }

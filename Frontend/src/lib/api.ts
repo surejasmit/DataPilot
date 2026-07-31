@@ -280,6 +280,13 @@ export const api = {
     async generateInsights(id: string): Promise<any[]> {
       return request<any[]>(`/datasets/${id}/insights`, { method: 'POST' });
     },
+
+    async askQuestion(id: string, question: string): Promise<any> {
+      return request<any>(`/datasets/${id}/question`, {
+        method: 'POST',
+        body: JSON.stringify({ question }),
+      });
+    },
   },
 
   analysis: {
@@ -288,6 +295,19 @@ export const api = {
     },
     async getAllInsights(): Promise<any[]> {
       return request<any[]>('/analysis/insights/all');
+    },
+    async exportReport(projectId: string): Promise<Blob> {
+      const token = localStorage.getItem('token');
+      const response = await fetch(`${API_BASE_URL}/analysis/${projectId}/export-report`, {
+        headers: {
+          ...(token && { Authorization: `Bearer ${token}` }),
+        },
+      });
+      if (!response.ok) {
+        const data = await response.json().catch(() => ({}));
+        throw new Error(data.error || 'Failed to export report');
+      }
+      return response.blob();
     },
   },
 };
