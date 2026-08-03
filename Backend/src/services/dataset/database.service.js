@@ -82,10 +82,10 @@ async function insertColumnStats(client, datasetId, columns) {
         is_datetime = EXCLUDED.is_datetime,
         is_boolean = EXCLUDED.is_boolean,
         updated_at = CURRENT_TIMESTAMP`,
-      [datasetId, colName, col.dataType || 'string', col.position || idx, col.missingCount || 0,
-       col.missingPercentage || 0, col.uniqueCount || 0, col.minValue, col.maxValue, col.meanValue,
-       col.medianValue, col.modeValue, col.stdDev, col.q1, col.q3,
-       !!col.isNumeric, !!col.isCategorical, !!col.isDatetime, !!col.isBoolean]
+      [datasetId, colName, col.data_type || col.dataType || 'string', col.position || idx, col.missing_count ?? col.missingCount ?? 0,
+       col.missing_percentage ?? col.missingPercentage ?? 0, col.unique_count ?? col.uniqueCount ?? 0, col.min_value ?? col.minValue ?? null, col.max_value ?? col.maxValue ?? null, col.mean_value ?? col.meanValue ?? null,
+       col.median_value ?? col.medianValue ?? null, col.mode_value ?? col.modeValue ?? null, col.std_dev ?? col.stdDev ?? null, col.q1 ?? null, col.q3 ?? null,
+       !!(col.is_numeric ?? col.isNumeric), !!(col.is_categorical ?? col.isCategorical), !!(col.is_datetime ?? col.isDatetime), !!(col.is_boolean ?? col.isBoolean)]
     );
   }
 }
@@ -156,10 +156,10 @@ async function insertStatistics(client, datasetId, numericColumns) {
         mode_value, std_dev, variance, q1, q3, iqr, missing_count,
         missing_percentage, unique_count, range_value)
        VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16)`,
-      [datasetId, colName, col.minValue, col.maxValue, col.meanValue,
-       col.medianValue, col.modeValue, col.stdDev, col.variance, col.q1,
-       col.q3, col.iqr, col.missingCount, col.missingPercentage,
-       col.uniqueCount, col.rangeValue]
+      [datasetId, colName, col.min_value ?? col.minValue ?? null, col.max_value ?? col.maxValue ?? null, col.mean_value ?? col.meanValue ?? null,
+       col.median_value ?? col.medianValue ?? null, col.mode_value ?? col.modeValue ?? null, col.std_dev ?? col.stdDev ?? null, col.variance ?? null, col.q1 ?? null,
+       col.q3 ?? null, col.iqr ?? null, col.missing_count ?? col.missingCount ?? 0, col.missing_percentage ?? col.missingPercentage ?? 0,
+       col.unique_count ?? col.uniqueCount ?? 0, col.range_value ?? col.rangeValue ?? null]
     );
   }
 }

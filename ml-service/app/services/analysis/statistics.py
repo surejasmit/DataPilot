@@ -56,8 +56,8 @@ def compute_column_statistics(series: pd.Series, data_type: str) -> Dict[str, An
             stats['q3'] = round(float(q3), 4)
             stats['iqr'] = round(float(q3 - q1), 4)
     else:
-        stats['min_value'] = str(non_null.iloc[0]) if len(non_null) > 0 else None
-        stats['max_value'] = str(non_null.iloc[-1]) if len(non_null) > 0 else None
+        stats['min_value'] = None
+        stats['max_value'] = None
         mode_val = non_null.mode()
         stats['mode_value'] = str(mode_val.iloc[0]) if len(mode_val) > 0 else None
     
