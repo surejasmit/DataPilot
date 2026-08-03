@@ -1,0 +1,123 @@
+[2026-07-25T07:34:06.563Z] [INFO] Server running on port 5000
+[2026-07-25T07:34:06.604Z] [ERROR] Database connection error {"error":"connect ECONNREFUSED 172.18.0.2:5432"}
+[2026-07-25T07:37:56.909Z] [INFO] Server running on port 5000
+[2026-07-25T07:37:57.022Z] [INFO] Database connected successfully
+[2026-07-25T07:55:29.330Z] [INFO] Server running on port 5000
+[2026-07-25T07:55:29.505Z] [INFO] Database connected successfully
+[2026-07-25T07:57:06.777Z] [INFO] Server running on port 5000
+[2026-07-25T07:57:06.891Z] [INFO] Database connected successfully
+[2026-07-25T13:00:40.828Z] [INFO] Server running on port 5000
+[2026-07-25T13:00:40.899Z] [INFO] Database connected successfully
+[2026-07-25T14:41:33.110Z] [INFO] Server running on port 5000
+[2026-07-25T14:41:33.222Z] [INFO] Database connected successfully
+[2026-07-25T14:48:08.918Z] [INFO] Server running on port 5000
+[2026-07-25T14:48:09.124Z] [INFO] Database connected successfully
+[2026-07-25T14:48:30.904Z] [INFO] Server running on port 5000
+[2026-07-25T14:48:30.941Z] [ERROR] Database connection error {"error":"connect ECONNREFUSED 172.18.0.2:5432"}
+[2026-07-25T14:49:51.645Z] [INFO] Server running on port 5000
+[2026-07-25T14:49:51.692Z] [INFO] Database connected successfully
+[2026-07-25T14:53:27.048Z] [INFO] Server running on port 5000
+[2026-07-25T14:53:27.108Z] [INFO] Database connected successfully
+[2026-07-25T15:03:18.838Z] [INFO] Server running on port 5000
+[2026-07-25T15:03:18.889Z] [INFO] Database connected successfully
+[2026-07-25T15:07:07.410Z] [INFO] Server running on port 5000
+[2026-07-25T15:07:07.494Z] [INFO] Database connected successfully
+[2026-07-25T15:13:37.665Z] [INFO] Server running on port 5000
+[2026-07-25T15:13:37.682Z] [ERROR] Database connection error {"error":"connect ECONNREFUSED 172.18.0.2:5432"}
+[2026-07-25T15:14:16.652Z] [INFO] Server running on port 5000
+[2026-07-25T15:14:16.706Z] [INFO] Database connected successfully
+[2026-07-25T15:15:50.567Z] [INFO] Server running on port 5000
+[2026-07-25T15:15:50.645Z] [INFO] Database connected successfully
+[2026-07-25T15:21:13.982Z] [INFO] Upload started {"fileName":"fifa_world_cup_2026_player_performance.csv","fileSize":0,"userId":1}
+[2026-07-25T15:21:14.026Z] [INFO] Upload completed {"fileName":"fifa_world_cup_2026_player_performance.csv","datasetId":4,"userId":1,"durationMs":31}
+[2026-07-25T15:21:14.041Z] [INFO] Analysis started {"datasetId":4,"userId":1}
+[2026-07-25T15:21:14.202Z] [ERROR] Analysis failed {"datasetId":4,"error":"Python service error: 500 - {\"detail\":\"Failed to read CSV: [Errno 2] No such file or directory: '/app/uploads/1784992866254-655997636.csv'\"}","userId":1}
+[2026-07-25T15:21:14.679Z] [ERROR] Failed to generate quality report via Python service {"error":"Python service error: 500 - {\"detail\":\"Failed to read CSV: [Errno 2] No such file or directory: '/app/uploads/1784992866254-655997636.csv'\"}"}
+[2026-07-25T15:21:14.769Z] [ERROR] Failed to generate quality report via Python service {"error":"Python service error: 500 - {\"detail\":\"Failed to read CSV: [Errno 2] No such file or directory: '/app/uploads/1784992866254-655997636.csv'\"}"}
+[2026-07-25T15:21:38.142Z] [ERROR] Failed to generate quality report via Python service {"error":"Python service error: 500 - {\"detail\":\"Failed to read CSV: [Errno 2] No such file or directory: '/app/uploads/1784992866254-655997636.csv'\"}"}
+[2026-07-25T15:21:38.334Z] [ERROR] Failed to generate quality report via Python service {"error":"Python service error: 500 - {\"detail\":\"Failed to read CSV: [Errno 2] No such file or directory: '/app/uploads/1784992866254-655997636.csv'\"}"}
+[2026-07-25T15:21:38.856Z] [ERROR] Failed to generate quality report via Python service {"error":"Python service error: 500 - {\"detail\":\"Failed to read CSV: [Errno 2] No such file or directory: '/app/uploads/1784992866254-655997636.csv'\"}"}
+[2026-07-25T15:21:38.964Z] [ERROR] Failed to generate quality report via Python service {"error":"Python service error: 500 - {\"detail\":\"Failed to read CSV: [Errno 2] No such file or directory: '/app/uploads/1784992866254-655997636.csv'\"}"}
+[2026-07-25T15:22:11.338Z] [ERROR] Failed to generate quality report via Python service {"error":"Python service error: 500 - {\"detail\":\"Failed to read CSV: [Errno 2] No such file or directory: '/app/uploads/1784992866254-655997636.csv'\"}"}
+[2026-07-25T15:22:11.591Z] [ERROR] Failed to generate quality report via Python service {"error":"Python service error: 500 - {\"detail\":\"Failed to read CSV: [Errno 2] No such file or directory: '/app/uploads/1784992866254-655997636.csv'\"}"}
+[2026-07-25T15:22:40.187Z] [ERROR] Failed to generate quality report via Python service {"error":"Python service error: 500 - {\"detail\":\"Failed to read CSV: [Errno 2] No such file or directory: '/app/uploads/1784992866254-655997636.csv'\"}"}
+[2026-07-25T15:22:40.239Z] [ERROR] Failed to generate quality report via Python service {"error":"Python service error: 500 - {\"detail\":\"Failed to read CSV: [Errno 2] No such file or directory: '/app/uploads/1784992866254-655997636.csv'\"}"}
+[2026-07-25T15:22:48.364Z] [ERROR] Failed to generate quality report via Python service {"error":"Python service error: 500 - {\"detail\":\"Failed to read CSV: [Errno 2] No such file or directory: '/app/uploads/1784992866254-655997636.csv'\"}"}
+[2026-07-25T15:22:48.457Z] [ERROR] Failed to generate quality report via Python service {"error":"Python service error: 500 - {\"detail\":\"Failed to read CSV: [Errno 2] No such file or directory: '/app/uploads/1784992866254-655997636.csv'\"}"}
+[2026-07-25T15:22:49.652Z] [ERROR] Failed to generate quality report via Python service {"error":"Python service error: 500 - {\"detail\":\"Failed to read CSV: [Errno 2] No such file or directory: '/app/uploads/1784992866254-655997636.csv'\"}"}
+[2026-07-25T15:22:49.764Z] [ERROR] Failed to generate quality report via Python service {"error":"Python service error: 500 - {\"detail\":\"Failed to read CSV: [Errno 2] No such file or directory: '/app/uploads/1784992866254-655997636.csv'\"}"}
+[2026-07-25T15:22:50.210Z] [ERROR] Failed to generate quality report via Python service {"error":"Python service error: 500 - {\"detail\":\"Failed to read CSV: [Errno 2] No such file or directory: '/app/uploads/1784992866254-655997636.csv'\"}"}
+[2026-07-25T15:22:50.303Z] [ERROR] Failed to generate quality report via Python service {"error":"Python service error: 500 - {\"detail\":\"Failed to read CSV: [Errno 2] No such file or directory: '/app/uploads/1784992866254-655997636.csv'\"}"}
+[2026-07-25T15:22:50.442Z] [ERROR] Failed to generate quality report via Python service {"error":"Python service error: 500 - {\"detail\":\"Failed to read CSV: [Errno 2] No such file or directory: '/app/uploads/1784992866254-655997636.csv'\"}"}
+[2026-07-25T15:22:50.559Z] [ERROR] Failed to generate quality report via Python service {"error":"Python service error: 500 - {\"detail\":\"Failed to read CSV: [Errno 2] No such file or directory: '/app/uploads/1784992866254-655997636.csv'\"}"}
+[2026-07-25T15:23:11.308Z] [INFO] Upload started {"fileName":"fifa_world_cup_2026_player_performance.csv","fileSize":0,"userId":1}
+[2026-07-25T15:23:11.348Z] [INFO] Upload completed {"fileName":"fifa_world_cup_2026_player_performance.csv","datasetId":5,"userId":1,"durationMs":16}
+[2026-07-25T15:23:11.363Z] [INFO] Analysis started {"datasetId":5,"userId":1}
+[2026-07-25T15:23:11.409Z] [ERROR] Analysis failed {"datasetId":5,"error":"Python service error: 500 - {\"detail\":\"Failed to read CSV: [Errno 2] No such file or directory: '/app/uploads/1784992987904-916888055.csv'\"}","userId":1}
+[2026-07-25T15:23:11.670Z] [ERROR] Failed to generate quality report via Python service {"error":"Python service error: 500 - {\"detail\":\"Failed to read CSV: [Errno 2] No such file or directory: '/app/uploads/1784992987904-916888055.csv'\"}"}
+[2026-07-25T15:23:11.748Z] [ERROR] Failed to generate quality report via Python service {"error":"Python service error: 500 - {\"detail\":\"Failed to read CSV: [Errno 2] No such file or directory: '/app/uploads/1784992987904-916888055.csv'\"}"}
+[2026-07-25T15:23:20.580Z] [ERROR] Failed to generate quality report via Python service {"error":"Python service error: 500 - {\"detail\":\"Failed to read CSV: [Errno 2] No such file or directory: '/app/uploads/1784992987904-916888055.csv'\"}"}
+[2026-07-25T15:23:20.700Z] [ERROR] Failed to generate quality report via Python service {"error":"Python service error: 500 - {\"detail\":\"Failed to read CSV: [Errno 2] No such file or directory: '/app/uploads/1784992987904-916888055.csv'\"}"}
+[2026-07-25T15:23:20.728Z] [ERROR] Failed to generate quality report via Python service {"error":"Python service error: 500 - {\"detail\":\"Failed to read CSV: [Errno 2] No such file or directory: '/app/uploads/1784992987904-916888055.csv'\"}"}
+[2026-07-25T15:23:20.775Z] [ERROR] Failed to generate quality report via Python service {"error":"Python service error: 500 - {\"detail\":\"Failed to read CSV: [Errno 2] No such file or directory: '/app/uploads/1784992987904-916888055.csv'\"}"}
+[2026-07-25T15:23:21.769Z] [ERROR] Failed to generate quality report via Python service {"error":"Python service error: 500 - {\"detail\":\"Failed to read CSV: [Errno 2] No such file or directory: '/app/uploads/1784992987904-916888055.csv'\"}"}
+[2026-07-25T15:23:21.877Z] [ERROR] Failed to generate quality report via Python service {"error":"Python service error: 500 - {\"detail\":\"Failed to read CSV: [Errno 2] No such file or directory: '/app/uploads/1784992987904-916888055.csv'\"}"}
+[2026-07-25T15:51:56.528Z] [INFO] Server running on port 5000
+[2026-07-25T15:51:56.571Z] [INFO] Database connected successfully
+[2026-07-25T15:52:25.492Z] [INFO] Upload started {"fileName":"fifa_world_cup_2026_player_performance.csv","fileSize":0,"userId":1}
+[2026-07-25T15:52:25.504Z] [INFO] Upload completed {"fileName":"fifa_world_cup_2026_player_performance.csv","datasetId":6,"userId":1,"durationMs":8}
+[2026-07-25T15:52:25.509Z] [INFO] Analysis started {"datasetId":6,"userId":1}
+[2026-07-25T15:52:25.571Z] [ERROR] Analysis failed {"datasetId":6,"error":"Python service error: 500 - {\"detail\":\"Failed to read CSV: [Errno 2] No such file or directory: '/app/uploads/1784994744977-307603795.csv'\"}","userId":1}
+[2026-07-25T15:52:25.675Z] [ERROR] Failed to generate quality report via Python service {"error":"Python service error: 500 - {\"detail\":\"Failed to read CSV: [Errno 2] No such file or directory: '/app/uploads/1784994744977-307603795.csv'\"}"}
+[2026-07-25T15:52:25.703Z] [ERROR] Failed to generate quality report via Python service {"error":"Python service error: 500 - {\"detail\":\"Failed to read CSV: [Errno 2] No such file or directory: '/app/uploads/1784994744977-307603795.csv'\"}"}
+[2026-07-25T15:52:25.730Z] [ERROR] Failed to generate quality report via Python service {"error":"Python service error: 500 - {\"detail\":\"Failed to read CSV: [Errno 2] No such file or directory: '/app/uploads/1784994744977-307603795.csv'\"}"}
+[2026-07-25T15:52:25.749Z] [ERROR] Failed to generate quality report via Python service {"error":"Python service error: 500 - {\"detail\":\"Failed to read CSV: [Errno 2] No such file or directory: '/app/uploads/1784994744977-307603795.csv'\"}"}
+[2026-07-25T15:54:39.502Z] [ERROR] Failed to generate quality report via Python service {"error":"Python service error: 500 - {\"detail\":\"Failed to read CSV: [Errno 2] No such file or directory: '/app/uploads/1784994744977-307603795.csv'\"}"}
+[2026-07-25T15:54:39.540Z] [ERROR] Failed to generate quality report via Python service {"error":"Python service error: 500 - {\"detail\":\"Failed to read CSV: [Errno 2] No such file or directory: '/app/uploads/1784994744977-307603795.csv'\"}"}
+[2026-07-25T15:54:39.562Z] [ERROR] Failed to generate quality report via Python service {"error":"Python service error: 500 - {\"detail\":\"Failed to read CSV: [Errno 2] No such file or directory: '/app/uploads/1784994744977-307603795.csv'\"}"}
+[2026-07-25T15:54:39.578Z] [ERROR] Failed to generate quality report via Python service {"error":"Python service error: 500 - {\"detail\":\"Failed to read CSV: [Errno 2] No such file or directory: '/app/uploads/1784994744977-307603795.csv'\"}"}
+[2026-07-25T15:54:42.141Z] [ERROR] Failed to generate quality report via Python service {"error":"Python service error: 500 - {\"detail\":\"Failed to read CSV: [Errno 2] No such file or directory: '/app/uploads/1784994744977-307603795.csv'\"}"}
+[2026-07-25T15:54:42.164Z] [ERROR] Failed to generate quality report via Python service {"error":"Python service error: 500 - {\"detail\":\"Failed to read CSV: [Errno 2] No such file or directory: '/app/uploads/1784994744977-307603795.csv'\"}"}
+[2026-07-25T15:54:42.174Z] [ERROR] Failed to generate quality report via Python service {"error":"Python service error: 500 - {\"detail\":\"Failed to read CSV: [Errno 2] No such file or directory: '/app/uploads/1784994744977-307603795.csv'\"}"}
+[2026-07-25T15:54:42.192Z] [ERROR] Failed to generate quality report via Python service {"error":"Python service error: 500 - {\"detail\":\"Failed to read CSV: [Errno 2] No such file or directory: '/app/uploads/1784994744977-307603795.csv'\"}"}
+[2026-07-25T15:55:06.938Z] [INFO] Upload started {"fileName":"fifa_world_cup_2026_player_performance.csv","fileSize":0,"userId":1}
+[2026-07-25T15:55:06.946Z] [INFO] Upload completed {"fileName":"fifa_world_cup_2026_player_performance.csv","datasetId":7,"userId":1,"durationMs":4}
+[2026-07-25T15:55:06.952Z] [INFO] Analysis started {"datasetId":7,"userId":1}
+[2026-07-25T15:55:06.966Z] [ERROR] Analysis failed {"datasetId":7,"error":"Python service error: 500 - {\"detail\":\"Failed to read CSV: [Errno 2] No such file or directory: '/app/uploads/1784994906366-847416786.csv'\"}","userId":1}
+[2026-07-25T15:55:07.063Z] [ERROR] Failed to generate quality report via Python service {"error":"Python service error: 500 - {\"detail\":\"Failed to read CSV: [Errno 2] No such file or directory: '/app/uploads/1784994906366-847416786.csv'\"}"}
+[2026-07-25T15:55:07.092Z] [ERROR] Failed to generate quality report via Python service {"error":"Python service error: 500 - {\"detail\":\"Failed to read CSV: [Errno 2] No such file or directory: '/app/uploads/1784994906366-847416786.csv'\"}"}
+[2026-07-25T15:55:07.100Z] [ERROR] Failed to generate quality report via Python service {"error":"Python service error: 500 - {\"detail\":\"Failed to read CSV: [Errno 2] No such file or directory: '/app/uploads/1784994906366-847416786.csv'\"}"}
+[2026-07-25T15:55:07.124Z] [ERROR] Failed to generate quality report via Python service {"error":"Python service error: 500 - {\"detail\":\"Failed to read CSV: [Errno 2] No such file or directory: '/app/uploads/1784994906366-847416786.csv'\"}"}
+[2026-07-25T15:56:24.787Z] [ERROR] Failed to generate quality report via Python service {"error":"Python service error: 500 - {\"detail\":\"Failed to read CSV: [Errno 2] No such file or directory: '/app/uploads/1784994906366-847416786.csv'\"}"}
+[2026-07-25T15:56:24.813Z] [ERROR] Failed to generate quality report via Python service {"error":"Python service error: 500 - {\"detail\":\"Failed to read CSV: [Errno 2] No such file or directory: '/app/uploads/1784994906366-847416786.csv'\"}"}
+[2026-07-25T15:56:24.822Z] [ERROR] Failed to generate quality report via Python service {"error":"Python service error: 500 - {\"detail\":\"Failed to read CSV: [Errno 2] No such file or directory: '/app/uploads/1784994906366-847416786.csv'\"}"}
+[2026-07-25T15:56:24.839Z] [ERROR] Failed to generate quality report via Python service {"error":"Python service error: 500 - {\"detail\":\"Failed to read CSV: [Errno 2] No such file or directory: '/app/uploads/1784994906366-847416786.csv'\"}"}
+[2026-07-25T15:56:39.337Z] [INFO] Upload started {"fileName":"fifa_world_cup_2026_player_performance.csv","fileSize":0,"userId":1}
+[2026-07-25T15:56:39.344Z] [INFO] Upload completed {"fileName":"fifa_world_cup_2026_player_performance.csv","datasetId":8,"userId":1,"durationMs":4}
+[2026-07-25T15:56:39.348Z] [INFO] Analysis started {"datasetId":8,"userId":1}
+[2026-07-25T15:56:39.364Z] [ERROR] Analysis failed {"datasetId":8,"error":"Python service error: 500 - {\"detail\":\"Failed to read CSV: [Errno 2] No such file or directory: '/app/uploads/1784994998790-568846229.csv'\"}","userId":1}
+[2026-07-25T15:56:39.456Z] [ERROR] Failed to generate quality report via Python service {"error":"Python service error: 500 - {\"detail\":\"Failed to read CSV: [Errno 2] No such file or directory: '/app/uploads/1784994998790-568846229.csv'\"}"}
+[2026-07-25T15:56:39.479Z] [ERROR] Failed to generate quality report via Python service {"error":"Python service error: 500 - {\"detail\":\"Failed to read CSV: [Errno 2] No such file or directory: '/app/uploads/1784994998790-568846229.csv'\"}"}
+[2026-07-25T15:56:39.491Z] [ERROR] Failed to generate quality report via Python service {"error":"Python service error: 500 - {\"detail\":\"Failed to read CSV: [Errno 2] No such file or directory: '/app/uploads/1784994998790-568846229.csv'\"}"}
+[2026-07-25T15:56:39.513Z] [ERROR] Failed to generate quality report via Python service {"error":"Python service error: 500 - {\"detail\":\"Failed to read CSV: [Errno 2] No such file or directory: '/app/uploads/1784994998790-568846229.csv'\"}"}
+[2026-07-25T16:01:07.078Z] [INFO] Server running on port 5000
+[2026-07-25T16:01:07.111Z] [INFO] Database connected successfully
+[2026-07-25T16:01:51.152Z] [INFO] Upload started {"fileName":"fifa_world_cup_2026_player_performance.csv","fileSize":0,"userId":1}
+[2026-07-25T16:01:51.161Z] [INFO] Upload completed {"fileName":"fifa_world_cup_2026_player_performance.csv","datasetId":9,"userId":1,"durationMs":5}
+[2026-07-25T16:01:51.166Z] [INFO] Analysis started {"datasetId":9,"userId":1}
+[2026-07-25T16:01:51.203Z] [ERROR] Analysis failed {"datasetId":9,"error":"Python service error: 500 - {\"detail\":\"Failed to read CSV: [Errno 2] No such file or directory: '/app/uploads/1784995310656-885017708.csv'\"}","userId":1}
+[2026-07-25T16:01:51.285Z] [ERROR] Failed to generate quality report via Python service {"error":"Python service error: 500 - {\"detail\":\"Failed to read CSV: [Errno 2] No such file or directory: '/app/uploads/1784995310656-885017708.csv'\"}"}
+[2026-07-25T16:01:51.307Z] [ERROR] Failed to generate quality report via Python service {"error":"Python service error: 500 - {\"detail\":\"Failed to read CSV: [Errno 2] No such file or directory: '/app/uploads/1784995310656-885017708.csv'\"}"}
+[2026-07-25T16:01:51.317Z] [ERROR] Failed to generate quality report via Python service {"error":"Python service error: 500 - {\"detail\":\"Failed to read CSV: [Errno 2] No such file or directory: '/app/uploads/1784995310656-885017708.csv'\"}"}
+[2026-07-25T16:01:51.359Z] [ERROR] Failed to generate quality report via Python service {"error":"Python service error: 500 - {\"detail\":\"Failed to read CSV: [Errno 2] No such file or directory: '/app/uploads/1784995310656-885017708.csv'\"}"}
+[2026-07-25T16:01:53.276Z] [ERROR] Failed to generate quality report via Python service {"error":"Python service error: 500 - {\"detail\":\"Failed to read CSV: [Errno 2] No such file or directory: '/app/uploads/1784995310656-885017708.csv'\"}"}
+[2026-07-25T16:01:53.335Z] [ERROR] Failed to generate quality report via Python service {"error":"Python service error: 500 - {\"detail\":\"Failed to read CSV: [Errno 2] No such file or directory: '/app/uploads/1784995310656-885017708.csv'\"}"}
+[2026-07-25T16:01:53.342Z] [ERROR] Failed to generate quality report via Python service {"error":"Python service error: 500 - {\"detail\":\"Failed to read CSV: [Errno 2] No such file or directory: '/app/uploads/1784995310656-885017708.csv'\"}"}
+[2026-07-25T16:01:53.356Z] [ERROR] Failed to generate quality report via Python service {"error":"Python service error: 500 - {\"detail\":\"Failed to read CSV: [Errno 2] No such file or directory: '/app/uploads/1784995310656-885017708.csv'\"}"}
+[2026-07-25T16:04:28.309Z] [INFO] Server running on port 5000
+[2026-07-25T16:04:28.333Z] [INFO] Database connected successfully
+[2026-07-25T16:21:22.873Z] [INFO] Server running on port 5000
+[2026-07-25T16:21:22.920Z] [INFO] Database connected successfully
+[2026-07-25T16:23:35.270Z] [ERROR] Database error: transaction {"error":"null value in column \"column_name\" of relation \"dataset_columns\" violates not-null constraint"}
+[2026-07-25T16:24:07.432Z] [INFO] Server running on port 5000
+[2026-07-25T16:24:07.477Z] [INFO] Database connected successfully

@@ -1,0 +1,46 @@
+[2026-07-31T05:26:43.879Z] [INFO] Server running on port 5000
+[2026-07-31T05:26:43.973Z] [INFO] Database connected successfully
+[2026-07-31T05:36:55.316Z] [INFO] Upload started {"fileName":"SuperMarket Analysis - SuperMarket Analysis (1).csv","fileSize":0,"userId":1}
+[2026-07-31T05:36:55.340Z] [INFO] Upload completed {"fileName":"SuperMarket Analysis - SuperMarket Analysis (1).csv","datasetId":1,"userId":1,"durationMs":18}
+[2026-07-31T05:36:55.347Z] [INFO] Analysis started {"datasetId":1,"userId":1}
+[2026-07-31T05:36:56.570Z] [ERROR] Database error: transaction {"error":"colName is not defined"}
+[2026-07-31T05:36:56.590Z] [ERROR] Analysis failed {"datasetId":1,"error":"colName is not defined","userId":1}
+[2026-07-31T05:38:23.395Z] [INFO] Upload started {"fileName":"Twitter+data+in+sheets.xlsx","fileSize":0,"userId":1}
+[2026-07-31T05:38:23.429Z] [INFO] Upload completed {"fileName":"Twitter+data+in+sheets.xlsx","datasetId":2,"userId":1,"durationMs":24}
+[2026-07-31T05:38:23.436Z] [INFO] Analysis started {"datasetId":2,"userId":1}
+[2026-07-31T05:38:39.376Z] [ERROR] Database error: transaction {"error":"colName is not defined"}
+[2026-07-31T05:38:39.380Z] [ERROR] Analysis failed {"datasetId":2,"error":"colName is not defined","userId":1}
+[2026-07-31T05:39:36.077Z] [INFO] Upload started {"fileName":"DA_HOTS_Tech_India_Smitsureja.xlsx","fileSize":0,"userId":1}
+[2026-07-31T05:39:36.089Z] [INFO] Upload completed {"fileName":"DA_HOTS_Tech_India_Smitsureja.xlsx","datasetId":3,"userId":1,"durationMs":7}
+[2026-07-31T05:39:36.095Z] [INFO] Analysis started {"datasetId":3,"userId":1}
+[2026-07-31T05:40:06.826Z] [INFO] Analysis completed {"datasetId":3,"userId":1,"durationMs":30736}
+[2026-07-31T05:40:06.922Z] [ERROR] Failed to generate quality report via Python service {"error":"Failed to call Python analysis service: read ECONNRESET"}
+[2026-07-31T05:41:51.703Z] [INFO] Upload started {"fileName":"SuperMarket Analysis - SuperMarket Analysis (1).csv","fileSize":0,"userId":1}
+[2026-07-31T05:41:51.713Z] [INFO] Upload completed {"fileName":"SuperMarket Analysis - SuperMarket Analysis (1).csv","datasetId":4,"userId":1,"durationMs":5}
+[2026-07-31T05:41:51.716Z] [INFO] Analysis started {"datasetId":4,"userId":1}
+[2026-07-31T05:41:52.159Z] [ERROR] Database error: transaction {"error":"colName is not defined"}
+[2026-07-31T05:41:52.162Z] [ERROR] Analysis failed {"datasetId":4,"error":"colName is not defined","userId":1}
+[2026-07-31T05:43:56.238Z] [INFO] Server running on port 5000
+[2026-07-31T05:43:56.287Z] [INFO] Database connected successfully
+[2026-07-31T06:03:01.088Z] [INFO] Server running on port 5000
+[2026-07-31T06:03:01.116Z] [INFO] Database connected successfully
+[2026-07-31T06:05:01.176Z] [INFO] Server running on port 5000
+[2026-07-31T06:05:01.236Z] [INFO] Database connected successfully
+[2026-07-31T06:05:46.838Z] [INFO] Upload started {"fileName":"SuperMarket Analysis - SuperMarket Analysis (1).csv","fileSize":0,"userId":1}
+[2026-07-31T06:05:46.852Z] [INFO] Upload completed {"fileName":"SuperMarket Analysis - SuperMarket Analysis (1).csv","datasetId":37,"userId":1,"durationMs":10}
+[2026-07-31T06:05:46.855Z] [INFO] Analysis started {"datasetId":37,"userId":1}
+[2026-07-31T06:05:47.403Z] [INFO] Analysis completed {"datasetId":37,"userId":1,"durationMs":551}
+[2026-07-31T07:21:23.983Z] [INFO] Server running on port 5000
+[2026-07-31T07:21:24.047Z] [INFO] Database connected successfully
+[2026-07-31T08:11:04.136Z] [INFO] Server running on port 5000
+[2026-07-31T08:11:04.452Z] [INFO] Database connected successfully
+[2026-07-31T08:13:48.128Z] [INFO] Server running on port 5000
+[2026-07-31T08:13:48.277Z] [INFO] Database connected successfully
+[2026-07-31T08:15:23.854Z] [INFO] Server running on port 5000
+[2026-07-31T08:15:24.094Z] [INFO] Database connected successfully
+[2026-07-31T08:19:16.733Z] [INFO] Server running on port 5000
+[2026-07-31T08:19:17.451Z] [INFO] Database connected successfully
+[2026-07-31T08:47:00.359Z] [INFO] Server running on port 5000
+[2026-07-31T08:47:00.449Z] [INFO] Database connected successfully
+[2026-07-31T11:15:26.300Z] [INFO] Server running on port 5000
+[2026-07-31T11:15:26.587Z] [INFO] Database connected successfully

@@ -1,0 +1,4 @@
+[2026-07-26T11:05:14.493Z] [INFO] Server running on port 5000
+[2026-07-26T11:05:14.617Z] [INFO] Database connected successfully
+[2026-07-26T12:21:58.211Z] [INFO] Server running on port 5000
+[2026-07-26T12:21:58.234Z] [ERROR] Database connection error {"error":"connect ECONNREFUSED 172.18.0.2:5432"}

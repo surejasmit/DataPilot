@@ -13,7 +13,6 @@ const uploadDataset = async (req, res) => {
 
     const parsedProjectId = parseInt(projectId);
     if (isNaN(parsedProjectId)) {
-      return res.status(400).json({ error: 'Project ID must be a number' });
     }
 
     const result = await datasetService.uploadDataset(
@@ -199,6 +198,30 @@ const generateInsightsNow = async (req, res) => {
   }
 };
 
+const askQuestion = async (req, res) => {
+  try {
+    const { question } = req.body;
+    if (!question) {
+      return res.status(400).json({ error: 'Question is required' });
+    }
+
+    const dataset = await datasetService.getDatasetById(req.params.id, req.user.id);
+    if (!dataset) {
+      return res.status(404).json({ error: 'Dataset not found' });
+    }
+
+    const fileInfo = await datasetService.getDatasetFilePath(req.params.id);
+    if (!fileInfo || !fileInfo.dataset_path) {
+      return res.status(404).json({ error: 'Dataset file not found' });
+    }
+
+    const result = await datasetService.askQuestion(fileInfo.dataset_path, fileInfo.dataset_name, question, req.params.id, req.user.id);
+    res.json(result);
+  } catch (err) {
+    res.status(500).json({ error: 'Failed to answer question', details: err.message });
+  }
+};
+
 module.exports = {
   uploadDataset,
   getDataset,
@@ -213,5 +236,6 @@ module.exports = {
   getCleaningHistory,
   confirmCleaning,
   getInsightsForDataset,
-  generateInsightsNow
+  generateInsightsNow,
+  askQuestion
 };

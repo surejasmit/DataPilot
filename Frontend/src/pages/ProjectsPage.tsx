@@ -164,16 +164,18 @@ export function ProjectsPage() {
   return (
     <div className="space-y-6 animate-fade-in">
       {/* Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-        <div>
-          <h1 className="text-2xl font-light text-fg-0">Projects</h1>
-          <p className="text-fg-1 mt-0.5">Manage and explore your data analysis projects</p>
+      <section>
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6">
+          <div>
+            <h1 className="text-2xl font-semibold text-fg-0 tracking-tight">Projects</h1>
+            <p className="text-sm text-fg-2 mt-1">Manage and explore your data analysis projects</p>
+          </div>
+          <Button asChild size="default" onClick={() => navigate('/projects/new')}>
+            <Plus className="w-4 h-4 mr-2" />
+            New Project
+          </Button>
         </div>
-        <Button asChild size="lg" onClick={() => navigate('/projects/new')}>
-          <Plus className="w-5 h-5" />
-          New Project
-        </Button>
-      </div>
+      </section>
 
       {/* Search & Filters */}
       <Card variant="outlined" className="p-4">

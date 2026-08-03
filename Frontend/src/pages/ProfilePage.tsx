@@ -87,7 +87,7 @@ export function ProfilePage() {
   return (
     <div className="space-y-6 animate-fade-in max-w-4xl">
       {/* Profile Header */}
-      <Card variant="elevated" className="p-6">
+      <Card variant="elevated" className="p-5">
         <div className="flex flex-col md:flex-row md:items-center gap-6">
           <div className="relative">
             <Avatar

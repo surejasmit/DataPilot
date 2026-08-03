@@ -63,19 +63,34 @@ export function DropdownMenu({ children }: DropdownMenuProps) {
 
 interface DropdownMenuTriggerProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
   children: ReactNode
+  asChild?: boolean
 }
 
 export const DropdownMenuTrigger = forwardRef<HTMLButtonElement, DropdownMenuTriggerProps>(
-  ({ className, children, ...props }, ref) => {
+  ({ className, children, asChild, ...props }, ref) => {
     const { isOpen, setIsOpen, triggerRef } = useDropdownMenu()
+
+    const handleRef = (el: HTMLButtonElement | null) => {
+      triggerRef.current = el
+      if (typeof ref === 'function') ref(el)
+      else if (ref) ref.current = el
+    }
+
+    if (asChild && React.isValidElement(children)) {
+      return React.cloneElement(children as React.ReactElement<Record<string, unknown>>, {
+        ref: handleRef,
+        onClick: (e: React.MouseEvent) => {
+          setIsOpen(!isOpen);
+          (children as React.ReactElement<Record<string, unknown>>).props.onClick?.(e)
+        },
+        'aria-expanded': isOpen,
+        'aria-haspopup': 'menu' as const,
+      })
+    }
 
     return (
       <button
-        ref={(el) => {
-          triggerRef.current = el
-          if (typeof ref === 'function') ref(el)
-          else if (ref) ref.current = el
-        }}
+        ref={handleRef}
         className={cn(
           'inline-flex items-center gap-1.5 text-sm font-medium text-fg-1 hover:text-fg-0 transition-colors',
           className
@@ -135,11 +150,24 @@ interface DropdownMenuItemProps extends React.ButtonHTMLAttributes<HTMLButtonEle
   shortcut?: string
   icon?: ReactNode
   destructive?: boolean
+  asChild?: boolean
 }
 
 export const DropdownMenuItem = forwardRef<HTMLButtonElement, DropdownMenuItemProps>(
-  ({ className, children, inset, shortcut, icon, destructive, onClick, ...props }, ref) => {
+  ({ className, children, inset, shortcut, icon, destructive, asChild, onClick, ...props }, ref) => {
     const { setIsOpen } = useDropdownMenu()
+
+    if (asChild && React.isValidElement(children)) {
+      return React.cloneElement(children as React.ReactElement<Record<string, unknown>>, {
+        ref,
+        role: 'menuitem',
+        onClick: (e: React.MouseEvent) => {
+          onClick?.(e as React.MouseEvent<HTMLButtonElement>);
+          (children as React.ReactElement<Record<string, unknown>>).props.onClick?.(e)
+          setIsOpen(false)
+        },
+      })
+    }
 
     return (
       <button

@@ -2,14 +2,7 @@ const path = require('path');
 const fs = require('fs');
 
 const logger = require('../../utils/logger');
-const { parseAndAnalyze } = require('./analyze.service');
-const { generateProfile } = require('./profile.service');
-const { getPreviewRows } = require('./preview.service');
-const { computeStatistics, generateStatistics } = require('./statistics.service');
-const { generateChartRecommendations } = require('./chart.service');
-const { detectQualityIssues } = require('./quality.service');
-const { performCleaning } = require('./cleaning.service');
-const { generateInsights } = require('./insight.service');
+const pythonService = require('../pythonAnalysis.service');
 const db = require('./database.service');
 
 function backgroundAnalysis(filePath, fileName, projectId, userId) {
@@ -24,34 +17,27 @@ function backgroundAnalysis(filePath, fileName, projectId, userId) {
         await db.insertStatusHistory(client, projectId, 'ANALYZING', 'Dataset analysis started');
       });
 
-      const { rows, columns } = await parseAndAnalyze(filePath, fileName);
+      const analysis = await pythonService.analyzeDataset(filePath, fileName, projectId, projectId, userId);
 
-      const processingTimeMs = Date.now() - startTime;
-      const fileStats = fs.statSync(filePath);
-      const fileSize = fileStats.size;
-
-      const { profile, columnStats } = generateProfile(rows, columns, fileSize, processingTimeMs);
-
-      for (const col of columnStats) {
-        const stats = computeStatistics(rows.map(r => r[col.columnName]), col.dataType === 'number' ? 'number' : 'other');
-        Object.assign(col, stats);
-      }
-
-      const statistics = generateStatistics(columnStats);
-      const recommendations = generateChartRecommendations(columnStats, rows);
-      const previewRows = rows.slice(0, 100);
+      const { profile, column_stats, statistics, chart_recommendations, insights, quality_report, preview_rows } = analysis;
 
       await db.withTransaction(async (client) => {
-        await db.updateProjectDatasetInfo(client, projectId, profile.totalRows, profile.totalColumns, fileSize);
-        await db.insertColumnStats(client, projectId, columnStats);
+        await db.updateProjectDatasetInfo(client, projectId, profile.total_rows, profile.total_columns, fs.statSync(filePath).size);
+        await db.insertColumnStats(client, projectId, column_stats);
         await db.insertProfile(client, projectId, profile);
-        await db.insertPreviewRows(client, projectId, previewRows);
+        await db.insertPreviewRows(client, projectId, preview_rows);
 
-        if (statistics.length > 0) {
+        if (statistics && statistics.length > 0) {
           await db.insertStatistics(client, projectId, statistics);
         }
-        if (recommendations.length > 0) {
-          await db.insertChartRecommendations(client, projectId, recommendations);
+        if (chart_recommendations && chart_recommendations.length > 0) {
+          await db.insertChartRecommendations(client, projectId, chart_recommendations);
+        }
+        if (insights && insights.length > 0) {
+          await db.insertInsights(client, projectId, insights);
+        }
+        if (quality_report) {
+          await db.insertQualityReport(client, projectId, quality_report);
         }
 
         await db.updateProjectStatus(client, projectId, 'READY');
@@ -195,16 +181,17 @@ async function getChartRecommendations(datasetId, userId) {
     return recommendations;
   }
 
-  const columns = await db.getColumns(datasetId);
-  return generateChartRecommendations(
-    columns.map(c => ({
-      columnName: c.column_name,
-      isNumeric: c.is_numeric,
-      isCategorical: c.is_categorical,
-      isDatetime: c.is_datetime
-    })),
-    []
-  );
+  const fileInfo = await db.getDatasetFilePath(datasetId);
+  if (fileInfo && fileInfo.dataset_path) {
+    try {
+      const analysis = await pythonService.analyzeDataset(fileInfo.dataset_path, fileInfo.dataset_name, datasetId, datasetId, userId);
+      return analysis.chart_recommendations || [];
+    } catch (err) {
+      logger.warn('Failed to get chart recommendations from Python service', { error: err.message });
+    }
+  }
+
+  return [];
 }
 
 async function getStatus(datasetId, userId) {
@@ -217,15 +204,23 @@ async function generateQualityReport(datasetId, userId) {
   const dataset = await db.getDatasetById(datasetId, userId);
   if (!dataset) return null;
 
-  const { rows, columns } = await parseAndAnalyze(dataset.dataset_path, dataset.dataset_name);
-  const report = detectQualityIssues(rows, columns);
+  const fileInfo = await db.getDatasetFilePath(datasetId);
+  if (!fileInfo || !fileInfo.dataset_path) return null;
 
-  await db.withTransaction(async (client) => {
-    await db.insertQualityReport(client, datasetId, report);
-    await db.insertOperationHistory(client, datasetId, userId, 'quality_report_generated', { issues: report.issues.length });
-  });
+  try {
+    const analysis = await pythonService.analyzeDataset(fileInfo.dataset_path, fileInfo.dataset_name, datasetId, datasetId, userId);
+    const report = analysis.quality_report;
 
-  return report;
+    await db.withTransaction(async (client) => {
+      await db.insertQualityReport(client, datasetId, report);
+      await db.insertOperationHistory(client, datasetId, userId, 'quality_report_generated', { issues: report.issues?.length || 0 });
+    });
+
+    return report;
+  } catch (err) {
+    logger.error('Failed to generate quality report via Python service', { error: err.message });
+    throw err;
+  }
 }
 
 async function getQualityReportResult(datasetId, userId) {
@@ -254,29 +249,21 @@ async function confirmCleaningOperation(datasetId, userId, operationId) {
   if (!fileInfo || !fileInfo.dataset_path) return { confirmed: true };
 
   const params = op ? op.details : {};
-  const result = await performCleaning(fileInfo.dataset_path, fileInfo.dataset_name, op.operation, params);
+  const result = await pythonService.cleanDataset(fileInfo.dataset_path, fileInfo.dataset_name, op.operation, params);
 
-  const { rows, columns } = await parseAndAnalyze(fileInfo.dataset_path, fileInfo.dataset_name);
-  const newProfile = generateProfile(result.cleanedRows, result.columns, dataset.dataset_size, 0);
-  const newColumns = newProfile.columnStats;
-  for (const col of newColumns) {
-    const stats = computeStatistics(result.cleanedRows.map(r => r[col.columnName]), col.dataType === 'number' ? 'number' : 'other');
-    Object.assign(col, stats);
-  }
-  const newStatistics = generateStatistics(newColumns);
-  const recommendations = generateChartRecommendations(newColumns, result.cleanedRows);
-  const previewRows = result.cleanedRows.slice(0, 100);
+  const analysis = await pythonService.analyzeDataset(fileInfo.dataset_path, fileInfo.dataset_name, datasetId, datasetId, userId);
+  const { profile, column_stats, statistics, chart_recommendations, preview_rows } = analysis;
 
   await db.withTransaction(async (client) => {
-    await db.updateProjectDatasetInfo(client, datasetId, newProfile.profile.totalRows, newProfile.profile.totalColumns, dataset.dataset_size);
-    await db.insertColumnStats(client, datasetId, newColumns);
-    await db.insertProfile(client, datasetId, newProfile.profile);
-    await db.insertPreviewRows(client, datasetId, previewRows);
-    if (newStatistics.length > 0) {
-      await db.insertStatistics(client, datasetId, newStatistics);
+    await db.updateProjectDatasetInfo(client, datasetId, profile.total_rows, profile.total_columns, dataset.dataset_size);
+    await db.insertColumnStats(client, datasetId, column_stats);
+    await db.insertProfile(client, datasetId, profile);
+    await db.insertPreviewRows(client, datasetId, preview_rows);
+    if (statistics && statistics.length > 0) {
+      await db.insertStatistics(client, datasetId, statistics);
     }
-    if (recommendations.length > 0) {
-      await db.insertChartRecommendations(client, datasetId, recommendations);
+    if (chart_recommendations && chart_recommendations.length > 0) {
+      await db.insertChartRecommendations(client, datasetId, chart_recommendations);
     }
     await db.insertOperationHistory(client, datasetId, userId, 'data_cleaning_completed', { operation: op.operation, rowsRemoved: result.removed || 0 });
   });
@@ -297,16 +284,19 @@ async function generateInsightsForDataset(datasetId, userId) {
   const fileInfo = await db.getDatasetFilePath(datasetId);
   if (!fileInfo || !fileInfo.dataset_path) return [];
 
-  const { rows, columns } = await parseAndAnalyze(fileInfo.dataset_path, fileInfo.dataset_name);
-  const columnsData = await db.getColumns(datasetId);
+  try {
+    const analysis = await pythonService.analyzeDataset(fileInfo.dataset_path, fileInfo.dataset_name, datasetId, datasetId, userId);
+    const insights = analysis.insights || [];
 
-  const insights = generateInsights(rows, columns, columnsData);
+    await db.withTransaction(async (client) => {
+      await db.insertInsights(client, datasetId, insights);
+    });
 
-  await db.withTransaction(async (client) => {
-    await db.insertInsights(client, datasetId, insights);
-  });
-
-  return insights;
+    return insights;
+  } catch (err) {
+    logger.error('Failed to generate insights via Python service', { error: err.message });
+    throw err;
+  }
 }
 
 async function getInsightsResult(datasetId, userId) {
@@ -318,6 +308,16 @@ async function getInsightsResult(datasetId, userId) {
     insights = await generateInsightsForDataset(datasetId, userId);
   }
   return insights;
+}
+
+async function askQuestion(filePath, fileName, question, datasetId, userId) {
+  try {
+    const result = await pythonService.askQuestion(filePath, fileName, question, datasetId, datasetId, userId);
+    return result;
+  } catch (err) {
+    logger.error('Failed to ask question via Python service', { error: err.message });
+    throw err;
+  }
 }
 
 module.exports = {
@@ -334,5 +334,6 @@ module.exports = {
   confirmCleaningOperation,
   getCleaningHistoryResult,
   generateInsightsForDataset,
-  getInsightsResult
+  getInsightsResult,
+  askQuestion
 };
