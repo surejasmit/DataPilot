@@ -25,21 +25,21 @@ const demoSteps: DemoStep[] = [
   {
     step: 1,
     label: 'Understand',
-    description: 'Parses "strongest growth" → compare regions by revenue growth rate (period-over-period).',
+    description: 'Parses "total revenue by region" → group sales data by geographic region and sum revenue.',
     icon: Search,
     color: 'data-2',
   },
   {
     step: 2,
     label: 'Query',
-    description: 'Generates: df.groupby("region")["revenue"].sum().pct_change().idxmax() — safe, parameterized.',
+    description: 'Generates: df.groupby("region")["revenue"].sum().sort_values(ascending=False) — safe, parameterized.',
     icon: Database,
     color: 'data-1',
   },
   {
     step: 3,
     label: 'Compute',
-    description: 'Executes on v2 dataset. West: +18.4%, North: +5.2%, East: +1.2%, South: −2.1%.',
+    description: 'Executes on v2 dataset. North America: $2.4M, EMEA: $1.8M, APAC: $1.2M, LATAM: $0.6M.',
     icon: Zap,
     color: 'accent',
   },
@@ -53,15 +53,15 @@ const demoSteps: DemoStep[] = [
 ]
 
 const followUpQuestions = [
-  'Why did West region outperform others?',
-  'Show me the revenue trend for West region by month',
-  'Which product drove the growth in West?',
-  'Compare growth rates: new vs. repeat customers',
-  'Was the growth statistically significant?',
+  'What is the total revenue by region?',
+  'Show me employee attrition by department',
+  'Which products have the highest profit margin?',
+  'What is the average salary by job role?',
+  'Which region had the strongest growth?',
 ]
 
 export function AskDataSection() {
-  const sectionRef = useRef<HTMLSectionElement>(null)
+  const sectionRef = useRef<HTMLElement>(null)
   const isVisible = useIntersectionObserver(sectionRef)
   const prefersReduced = useReducedMotion()
   const [activeStep, setActiveStep] = useState(0)
@@ -91,7 +91,7 @@ export function AskDataSection() {
             Natural Language Interface
           </span>
           <h2 id="ask-heading" className="text-3xl md:text-4xl lg:text-5xl font-light text-fg-0 tracking-tight">
-            Ask your data <span className="font-medium">anything</span>
+            Ask your business data <span className="font-medium">anything</span>
           </h2>
           <p className="mt-4 text-lg text-fg-1 max-w-2xl mx-auto">
             Type a question in plain English. DataPilot translates it to a structured query,
@@ -106,7 +106,7 @@ export function AskDataSection() {
               <div className="mb-6 p-4 bg-bg-2 rounded-lg border border-border-1">
                 <div className="flex items-center gap-3 mb-4">
                   <MessageSquare className="w-5 h-5 text-accent" />
-                  <span className="font-mono text-fg-0 text-lg">"Which region had the strongest growth?"</span>
+                  <span className="font-mono text-fg-0 text-lg">"What is the total revenue by region?"</span>
                 </div>
                 <div className="flex items-center gap-2 text-sm text-fg-2 flex-wrap">
                   <Badge variant="info" size="sm">v2 dataset</Badge>
@@ -166,27 +166,27 @@ export function AskDataSection() {
                   <Badge variant="success" size="sm">Calculated</Badge>
                 </div>
                 <div className="p-4 bg-bg-2 rounded-lg">
-                  <p className="font-medium text-fg-0 mb-2">West region had the strongest growth at 18.4%</p>
+                  <p className="font-medium text-fg-0 mb-2">Total revenue by region: North America leads with $2.4M</p>
                   <div className="grid grid-cols-4 gap-2 text-sm">
                     <div className="text-center p-2 bg-bg-1 rounded">
-                      <div className="font-mono text-fg-0">West</div>
-                      <div className="text-success text-xs">+18.4%</div>
+                      <div className="font-mono text-fg-0">NA</div>
+                      <div className="text-success text-xs">$2.4M</div>
                     </div>
                     <div className="text-center p-2 bg-bg-1 rounded">
-                      <div className="font-mono text-fg-0">North</div>
-                      <div className="text-fg-1 text-xs">+5.2%</div>
+                      <div className="font-mono text-fg-0">EMEA</div>
+                      <div className="text-fg-1 text-xs">$1.8M</div>
                     </div>
                     <div className="text-center p-2 bg-bg-1 rounded">
-                      <div className="font-mono text-fg-0">East</div>
-                      <div className="text-fg-1 text-xs">+1.2%</div>
+                      <div className="font-mono text-fg-0">APAC</div>
+                      <div className="text-fg-1 text-xs">$1.2M</div>
                     </div>
                     <div className="text-center p-2 bg-bg-1 rounded">
-                      <div className="font-mono text-fg-0">South</div>
-                      <div className="text-error text-xs">−2.1%</div>
+                      <div className="font-mono text-fg-0">LATAM</div>
+                      <div className="text-fg-1 text-xs">$0.6M</div>
                     </div>
                   </div>
                   <div className="mt-3 pt-3 border-t border-border-1 text-xs text-fg-2">
-                    <span className="font-mono">Evidence: </span>Revenue sum by region, period-over-period pct_change, dataset v2 rows 1–12,480
+                    <span className="font-mono">Evidence: </span>Revenue sum by region, dataset v2 rows 1–12,480
                   </div>
                 </div>
               </div>
@@ -220,7 +220,7 @@ export function AskDataSection() {
                   </div>
                   <div>
                     <h5 className="font-medium text-fg-0 mb-1">Intent Parsing</h5>
-                    <p>Identifies entities (region, growth), metrics (revenue), and operations (compare, rank).</p>
+                    <p>Identifies entities (region, revenue), metrics (total), and operations (group, compare).</p>
                   </div>
                 </div>
                 <div className="flex items-start gap-3 p-4 bg-bg-2 rounded-lg">

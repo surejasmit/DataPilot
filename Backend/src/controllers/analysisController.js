@@ -40,7 +40,6 @@ const exportReport = async (req, res) => {
     if (!result) {
       return res.status(404).json({ error: 'Project not found or no dataset uploaded' });
     }
-
     res.setHeader('Content-Type', 'application/pdf');
     res.setHeader('Content-Disposition', `attachment; filename="${result.filename}"`);
     res.send(result.buffer);
@@ -50,8 +49,32 @@ const exportReport = async (req, res) => {
   }
 };
 
+const trainMLModels = async (req, res) => {
+  try {
+    const pythonService = require('../services/pythonAnalysis.service');
+    const result = await pythonService.trainModels();
+    res.json(result);
+  } catch (err) {
+    console.error('Train ML models error:', err);
+    res.status(500).json({ error: 'Failed to trigger ML model training', details: err.message });
+  }
+};
+
+const getMLStatus = async (req, res) => {
+  try {
+    const pythonService = require('../services/pythonAnalysis.service');
+    const status = await pythonService.getMLStatus();
+    res.json(status);
+  } catch (err) {
+    console.error('Get ML status error:', err);
+    res.status(500).json({ error: 'Failed to fetch ML status', details: err.message });
+  }
+};
+
 module.exports = {
   getAnalysis,
   getAllInsights,
   exportReport,
+  trainMLModels,
+  getMLStatus,
 };

@@ -19,7 +19,7 @@ async function fixFailedProjects() {
       const { profile, column_stats, statistics, chart_recommendations, insights, quality_report, preview_rows } = analysis;
 
       await db.withTransaction(async (client) => {
-        await db.updateProjectDatasetInfo(client, proj.id, profile.total_rows, profile.total_columns, fs.statSync(proj.dataset_path).size);
+        await db.updateProjectDatasetInfo(client, proj.id, profile.total_rows ?? profile.totalRows, profile.total_columns ?? profile.totalColumns, fs.existsSync(proj.dataset_path) ? fs.statSync(proj.dataset_path).size : 0);
         await db.insertColumnStats(client, proj.id, column_stats);
         await db.insertProfile(client, proj.id, profile);
         await db.insertPreviewRows(client, proj.id, preview_rows);

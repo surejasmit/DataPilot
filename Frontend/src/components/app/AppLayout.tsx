@@ -30,7 +30,7 @@ const navigationSections: NavSection[] = [
     ],
   },
   {
-    label: 'Data & AI',
+    label: 'Analytics',
     items: [
       { path: '/insights', label: 'AI Insights', icon: Lightbulb },
       { path: '/ask-ai', label: 'AI Chat', icon: MessageSquare },
@@ -79,12 +79,17 @@ export function AppLayout() {
         aria-label="Main navigation"
       >
         <div className="flex flex-col h-full">
-          <div className="flex items-center gap-3 px-5 py-4 border-b border-border-1">
-            <svg className="w-7 h-7 text-accent" viewBox="0 0 32 32" fill="none" aria-hidden="true">
-              <rect width="32" height="32" rx="6" fill="currentColor" />
-              <path d="M8 10h16M8 16h12M8 22h8" stroke="#0a0b0d" strokeWidth="2.5" strokeLinecap="round" />
-            </svg>
-            <span className="font-semibold text-lg text-fg-0 tracking-tight">DataPilot AI</span>
+          <div className="px-5 py-4 border-b border-border-1">
+            <div className="flex items-center gap-3">
+              <svg className="w-7 h-7 text-accent" viewBox="0 0 32 32" fill="none" aria-hidden="true">
+                <rect width="32" height="32" rx="6" fill="currentColor" />
+                <path d="M8 10h16M8 16h12M8 22h8" stroke="#0a0b0d" strokeWidth="2.5" strokeLinecap="round" />
+              </svg>
+              <div>
+                <span className="font-semibold text-lg text-fg-0 tracking-tight block leading-tight">DataPilot AI</span>
+                <span className="text-[10px] text-fg-3 font-medium uppercase tracking-wider">Business Analytics</span>
+              </div>
+            </div>
           </div>
 
           <nav className="flex-1 px-3 py-4 space-y-5 overflow-y-auto" role="navigation">
@@ -128,11 +133,8 @@ export function AppLayout() {
           <div className="p-3 border-t border-border-1">
             <div className="px-3 py-2">
               <p className="text-[11px] text-fg-3">
-                <span className="font-medium text-fg-2">2.4 GB</span> of 5 GB used
+                <span className="font-medium text-fg-2">DataPilot AI</span> — Business Analytics
               </p>
-              <div className="mt-1.5 h-1.5 bg-bg-2 rounded-full overflow-hidden">
-                <div className="h-full bg-accent rounded-full" style={{ width: '48%' }} />
-              </div>
             </div>
           </div>
         </div>

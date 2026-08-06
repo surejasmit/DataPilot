@@ -12,6 +12,7 @@ from app.services.analysis.statistics import generate_statistics_summary
 from app.services.analysis.insights import generate_insights
 from app.services.analysis.charts import recommend_charts
 from app.services.analysis.quality import detect_quality_issues
+from app.services.analysis.business_validation import detect_business_domain
 
 router = APIRouter(prefix="/api/v1", tags=["report"])
 
@@ -44,6 +45,7 @@ async def generate_report_endpoint(request: ReportRequest):
         chart_recommendations = recommend_charts(df, column_types, column_stats)
         insights = generate_insights(df, column_types, column_stats)
         quality = detect_quality_issues(df)
+        validation = detect_business_domain(df)
 
         column_analysis = []
         for cs in column_stats:
@@ -97,6 +99,9 @@ async def generate_report_endpoint(request: ReportRequest):
             'aiInsights': insights,
             'issues': quality.get('issues', []) if quality else [],
             'rawNumericData': raw_numeric_data,
+            'businessDomain': validation.get('domain', 'unknown'),
+            'isBusiness': validation.get('is_business', False),
+            'businessConfidence': validation.get('confidence', 0.0),
         }
 
         pdf_path = generate_report(

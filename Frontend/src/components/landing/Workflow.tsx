@@ -1,4 +1,4 @@
-import { useRef } from 'react'
+import { useRef, useState } from 'react'
 import { motion } from 'framer-motion'
 import { useIntersectionObserver, useReducedMotion } from '@/hooks/useMedia'
 import { cn } from '@/lib/utils'
@@ -16,16 +16,16 @@ import {
 const steps = [
   {
     number: '01',
-    title: 'Upload & Profile',
-    description: 'Drag a CSV or connect a source. DataPilot reads structure, infers types, computes statistics, and builds a quality profile — all locally first.',
+    title: 'Upload Business Data',
+    description: 'Drag a CSV or connect a source. Supports CSV, Excel, JSON, Parquet. DataPilot reads structure, infers types, computes statistics, and builds a quality profile — all locally first.',
     icon: FileSpreadsheet,
     color: 'data-1',
     details: ['Auto-detect delimiters & encoding', 'Infer 15+ data types', 'Row/column stats & distributions', 'Missing & duplicate counts'],
   },
   {
     number: '02',
-    title: 'Quality Scan',
-    description: 'Automated analysis surfaces missing values, duplicates, outliers, type mismatches, and schema drift. Every issue is explained with row-level evidence.',
+    title: 'AI-Powered Analysis',
+    description: 'Automated statistical profiling, quality assessment, and data validation. Every issue is explained with row-level evidence and actionable recommendations.',
     icon: Search,
     color: 'data-2',
     details: ['Missing value patterns', 'Exact & fuzzy duplicates', 'IQR & Z-score outliers', 'Schema validation rules'],
@@ -40,16 +40,16 @@ const steps = [
   },
   {
     number: '04',
-    title: 'Pattern Discovery',
-    description: 'Statistical engine finds correlations, trends, segment differences, anomalies, and KPI shifts. Each insight cites the exact calculation behind it.',
+    title: 'Business Insights',
+    description: 'Discover KPIs, trends, anomalies, and segment differences. Statistical engine finds correlations and patterns. Each insight cites the exact calculation behind it.',
     icon: Lightbulb,
     color: 'data-3',
     details: ['Pearson/Spearman correlations', 'Time-series decompositions', 'Segment performance gaps', 'Anomaly scoring (isolation forest)'],
   },
   {
     number: '05',
-    title: 'Auto-Dashboard',
-    description: 'Column types drive chart selection: time+numeric → line, category+numeric → bar, single numeric → histogram. Layout is editable — add, remove, resize, retype.',
+    title: 'Visualize & Report',
+    description: 'Column types drive chart selection: time+numeric → line, category+numeric → bar, single numeric → histogram. Export dashboards to PDF or share with your team.',
     icon: BarChart3,
     color: 'data-2',
     details: ['Smart chart type inference', 'Drag-drop grid layout', 'KPI cards for aggregates', 'Export to PNG/PDF/Embed'],
@@ -57,7 +57,7 @@ const steps = [
   {
     number: '06',
     title: 'Ask Your Data',
-    description: 'Type a question. DataPilot parses intent, generates safe Pandas/SQL, executes it, returns the computed answer with evidence. The SLM explains — it never guesses numbers.',
+    description: 'Type a question in plain English. DataPilot parses intent, generates safe Pandas/SQL, executes it, returns the computed answer with evidence. The SLM explains — it never guesses numbers.',
     icon: MessageSquare,
     color: 'data-4',
     details: ['NL → structured query', 'Execution sandbox', 'Cited row/column evidence', 'Auto-chart when useful'],
@@ -74,7 +74,7 @@ const stepColors: Record<string, string> = {
 }
 
 export function Workflow() {
-  const sectionRef = useRef<HTMLSectionElement>(null)
+  const sectionRef = useRef<HTMLElement>(null)
   const isVisible = useIntersectionObserver(sectionRef)
   const prefersReduced = useReducedMotion()
   const [expandedIndex, setExpandedIndex] = useState<number | null>(null)
@@ -89,7 +89,7 @@ export function Workflow() {
       <div className="mx-auto max-w-[1400px]">
         <div className="text-center max-w-3xl mx-auto mb-16">
           <h2 id="workflow-heading" className="text-3xl md:text-4xl lg:text-5xl font-light text-fg-0 tracking-tight">
-            How it works: <span className="font-medium">Raw Data → Structure → Insight</span>
+            How it works: <span className="font-medium">Data → Insight → Action</span>
           </h2>
           <p className="mt-4 text-lg text-fg-1 max-w-2xl mx-auto">
             Six connected stages. Each builds on the last. You stay in control at every step.
@@ -171,7 +171,7 @@ export function Workflow() {
                               visible: { opacity: 1, height: 'auto', transition: { staggerChildren: 0.05 } },
                             }}
                           >
-                            {step.details.map((detail, i) => (
+                            {step.details.map((detail) => (
                               <motion.li
                                 key={detail}
                                 variants={{
@@ -212,5 +212,3 @@ export function Workflow() {
     </section>
   )
 }
-
-import { useState } from 'react'

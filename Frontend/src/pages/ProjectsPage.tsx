@@ -5,6 +5,7 @@ import { cn } from '@/lib/utils'
 import { Button, Input } from '@/components/ui'
 import { Card, CardContent } from '@/components/ui/Card'
 import { Badge } from '@/components/ui/Badge'
+import { BusinessDomainBadge, getDomainFromProjectName } from '@/components/ui/BusinessDomainBadge'
 import {
   DropdownMenu,
   DropdownMenuTrigger,
@@ -14,9 +15,7 @@ import {
   DropdownMenuSeparator,
 } from '@/components/ui/DropdownMenu'
 import {
-  LayoutDashboard,
   FolderKanban,
-  FileSpreadsheet,
   Star,
   MoreVertical,
   Eye,
@@ -28,7 +27,6 @@ import {
   ArrowUpDown,
   ChevronDown,
   Plus,
-  Loader2,
   AlertCircle,
 } from 'lucide-react'
 import { Avatar } from '@/components/ui/Avatar'
@@ -114,7 +112,7 @@ export function ProjectsPage() {
     if (!confirm('Are you sure you want to delete this project?')) return
     try {
       await api.projects.delete(id)
-      setProjects(prev => prev.filter(p => p.id !== id))
+      setProjects(prev => prev.filter(p => String(p.id) !== id))
     } catch (err) {
       alert(err instanceof Error ? err.message : 'Failed to delete project')
     }
@@ -122,7 +120,7 @@ export function ProjectsPage() {
 
   const handleToggleFavorite = async (project: Project) => {
     try {
-      const updated = await api.projects.toggleFavorite(project.id)
+      const updated = await api.projects.toggleFavorite(String(project.id))
       setProjects(prev => prev.map(p => p.id === project.id ? updated : p))
     } catch (err) {
       console.error('Failed to toggle favorite:', err)
@@ -152,7 +150,7 @@ export function ProjectsPage() {
         }
         if (typeof aVal === 'string') {
           aVal = aVal.toLowerCase()
-          bVal = bVal.toLowerCase()
+          bVal = String(bVal).toLowerCase()
         }
         const comparison = aVal < bVal ? -1 : aVal > bVal ? 1 : 0
         return sortOrder === 'asc' ? comparison : -comparison
@@ -170,7 +168,7 @@ export function ProjectsPage() {
             <h1 className="text-2xl font-semibold text-fg-0 tracking-tight">Projects</h1>
             <p className="text-sm text-fg-2 mt-1">Manage and explore your data analysis projects</p>
           </div>
-          <Button asChild size="default" onClick={() => navigate('/projects/new')}>
+          <Button asChild size="md" onClick={() => navigate('/projects/new')}>
             <Plus className="w-4 h-4 mr-2" />
             New Project
           </Button>
@@ -331,7 +329,7 @@ export function ProjectsPage() {
                             Export
                           </DropdownMenuItem>
                           <DropdownMenuSeparator />
-                          <DropdownMenuItem className="text-error" onClick={() => handleDelete(project.id)}>
+                          <DropdownMenuItem className="text-error" onClick={() => handleDelete(String(project.id))}>
                             <Trash2 className="w-4 h-4 mr-2" />
                             Delete
                           </DropdownMenuItem>
@@ -340,6 +338,9 @@ export function ProjectsPage() {
                     </div>
 
                     <h3 className="font-medium text-fg-0 mb-1 truncate">{project.name}</h3>
+                    <div className="mb-2">
+                      <BusinessDomainBadge domain={getDomainFromProjectName(project.name)} />
+                    </div>
                     <p className="text-sm text-fg-2 mb-3 truncate">{project.dataset_name || 'No dataset'}</p>
 
                     <div className="grid grid-cols-2 gap-3 mb-4 p-3 bg-bg-2 rounded-lg">

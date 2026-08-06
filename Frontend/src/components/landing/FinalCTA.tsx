@@ -2,12 +2,11 @@ import { Link } from 'react-router-dom'
 import { useRef } from 'react'
 import { motion } from 'framer-motion'
 import { useIntersectionObserver, useReducedMotion } from '@/hooks/useMedia'
-import { cn } from '@/lib/utils'
 import { Button } from '@/components/ui'
 import { ArrowRight } from 'lucide-react'
 
 export function FinalCTA() {
-  const sectionRef = useRef<HTMLSectionElement>(null)
+  const sectionRef = useRef<HTMLElement>(null)
   const isVisible = useIntersectionObserver(sectionRef)
   const prefersReduced = useReducedMotion()
 
@@ -36,14 +35,12 @@ export function FinalCTA() {
           </span>
 
           <h2 id="cta-heading" className="text-4xl md:text-5xl lg:text-6xl font-light text-fg-0 tracking-tight leading-[1.05]">
-            Your data already contains the story.
-            <br />
-            <span className="font-medium">DataPilot helps you find it.</span>
+            Start Analyzing Your Business Data
           </h2>
 
           <p className="text-lg text-fg-1 max-w-2xl mx-auto leading-relaxed">
-            Upload a CSV. Get a quality profile. Fix issues with control. Discover patterns.
-            Build dashboards. Ask questions. All backed by real calculations — not guesses.
+            Join organizations using DataPilot AI for business intelligence. Upload a CSV, get a quality profile,
+            fix issues with control, discover patterns, build dashboards, and ask questions — all backed by real calculations.
           </p>
 
           <div className="flex flex-col sm:flex-row items-center justify-center gap-4 pt-4">

@@ -1,5 +1,10 @@
 const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
 
+function getAuthHeaders(): Record<string, string> {
+  const token = getAuthToken();
+  return token ? { 'Authorization': `Bearer ${token}` } : {};
+}
+
 interface User {
   id: string;
   email: string;
@@ -112,9 +117,7 @@ interface ChartRecommendation {
   reason: string;
 }
 
-interface ApiError {
-  error: string;
-}
+
 
 async function request<T>(
   endpoint: string,
@@ -160,6 +163,38 @@ export const api = {
 
     async getMe(): Promise<User> {
       return request<User>('/users/me');
+    },
+
+    async updateProfile(data: { name?: string; email?: string }): Promise<User> {
+      const response = await fetch(`${API_BASE_URL}/auth/me`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json', ...getAuthHeaders() },
+        body: JSON.stringify(data),
+      });
+      if (!response.ok) throw new Error('Failed to update profile');
+      return response.json();
+    },
+
+    async changePassword(data: { currentPassword: string; newPassword: string }): Promise<{ message: string }> {
+      const response = await fetch(`${API_BASE_URL}/auth/me/password`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json', ...getAuthHeaders() },
+        body: JSON.stringify(data),
+      });
+      if (!response.ok) {
+        const err = await response.json();
+        throw new Error(err.error || 'Failed to change password');
+      }
+      return response.json();
+    },
+
+    async deleteAccount(): Promise<{ message: string }> {
+      const response = await fetch(`${API_BASE_URL}/auth/me`, {
+        method: 'DELETE',
+        headers: getAuthHeaders(),
+      });
+      if (!response.ok) throw new Error('Failed to delete account');
+      return response.json();
     },
   },
 
@@ -286,6 +321,14 @@ export const api = {
         method: 'POST',
         body: JSON.stringify({ question }),
       });
+    },
+
+    async getSuggestedQuestions(id: string): Promise<string[]> {
+      const response = await fetch(`${API_BASE_URL}/datasets/${id}/question/suggested`, {
+        headers: getAuthHeaders(),
+      });
+      if (!response.ok) throw new Error('Failed to get suggested questions');
+      return response.json();
     },
   },
 

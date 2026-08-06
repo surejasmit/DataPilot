@@ -5,6 +5,7 @@ import { cn } from '@/lib/utils'
 import { Button, Input } from '@/components/ui'
 import { Card } from '@/components/ui/Card'
 import { Badge } from '@/components/ui/Badge'
+import { BusinessDomainBadge, getDomainFromProjectName } from '@/components/ui/BusinessDomainBadge'
 import { api, Project, DatasetPreview, AnalysisData } from '@/lib/api'
 import {
   Database, FileSpreadsheet, Rows3, Columns3, AlertTriangle, AlertCircle, CheckCircle2,
@@ -44,13 +45,12 @@ export function DatasetDashboardPage() {
   const [qualityLoading, setQualityLoading] = useState(false)
   const [cleaningLoading, setCleaningLoading] = useState<number | null>(null)
   const [confirmDialog, setConfirmDialog] = useState<{ issue: any; operation: string; label: string } | null>(null)
-  const [confirmCleanDialog, setConfirmCleanDialog] = useState<{ operation: string } | null>(null)
+  const [confirmCleanDialog, setConfirmCleanDialog] = useState<{ operation: string; label: string; params?: Record<string, string> } | null>(null)
   const [cleaningHistory, setCleaningHistory] = useState<any[]>([])
   const [exporting, setExporting] = useState(false)
 
   const hasDataset = !!project?.dataset_name
   const isAnalyzing = analysis?.status === 'UPLOADING' || analysis?.status === 'ANALYZING' || project?.status === 'UPLOADING' || project?.status === 'ANALYZING'
-  const isFailed = analysis?.status === 'FAILED' || project?.status === 'FAILED'
 
   const loadAnalysis = useCallback(async (isRefresh = false) => {
     if (!id) return
@@ -192,9 +192,9 @@ export function DatasetDashboardPage() {
     setConfirmDialog({ issue, operation, label: labels[operation] || operation })
   }
 
-  const executeCleaning = async (operation: string) => {
+  const executeCleaning = async (operation: string, label: string, params?: Record<string, string>) => {
     if (!id || !project) return
-    setConfirmCleanDialog({ operation })
+    setConfirmCleanDialog({ operation, label, params })
   }
 
   if (loading) {
@@ -215,7 +215,7 @@ export function DatasetDashboardPage() {
           <AlertCircle className="w-10 h-10 text-error mx-auto mb-3" />
           <h3 className="text-base font-medium text-fg-0 mb-2">Error Loading Analysis</h3>
           <p className="text-sm text-fg-2 mb-4">{error}</p>
-          <Button onClick={loadAnalysis}><RefreshCw className="w-4 h-4 mr-2" />Retry</Button>
+          <Button onClick={() => loadAnalysis()}><RefreshCw className="w-4 h-4 mr-2" />Retry</Button>
         </Card>
       </div>
     )
@@ -241,6 +241,7 @@ export function DatasetDashboardPage() {
           <div>
             <div className="flex items-center gap-3">
               <h1 className="text-xl font-semibold text-fg-0">{project.name}</h1>
+              <BusinessDomainBadge domain={getDomainFromProjectName(project.name)} />
               <Badge className={project.status === 'READY' || project.status === 'completed' ? 'bg-success-bg text-success' : project.status === 'ANALYZING' || project.status === 'processing' ? 'bg-warning-bg text-warning' : 'bg-info-bg text-info'}>{project.status}</Badge>
             </div>
             <p className="text-sm text-fg-2 mt-1">{project.dataset_name || 'No dataset uploaded'}</p>
@@ -619,7 +620,9 @@ export function DatasetDashboardPage() {
                       <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
                         {[
                           { op: 'remove_missing', label: 'Remove Missing Values', icon: Trash2 },
-                          { op: 'fill_missing', label: 'Fill Missing Values', icon: ClipboardCheck },
+                          { op: 'fill_missing_mode', label: 'Mode Imputation', icon: ClipboardCheck, params: { method: 'mode' } },
+                          { op: 'fill_missing_median', label: 'Median Imputation', icon: ClipboardCheck, params: { method: 'median' } },
+                          { op: 'fill_missing_mean', label: 'Mean Imputation', icon: ClipboardCheck, params: { method: 'mean' } },
                           { op: 'remove_duplicates', label: 'Remove Duplicate Rows', icon: ClipboardX },
                           { op: 'trim_spaces', label: 'Trim Spaces', icon: Settings2 },
                           { op: 'normalize', label: 'Normalize Data', icon: TrendingUp },
@@ -628,7 +631,11 @@ export function DatasetDashboardPage() {
                         ].map(item => (
                           <button
                             key={item.op}
-                            onClick={() => executeCleaning(item.op)}
+                            onClick={() => executeCleaning(
+                              item.op.startsWith('fill_missing') ? 'fill_missing' : item.op,
+                              item.label,
+                              item.params
+                            )}
                             className="p-3 bg-bg-2 border border-border-1 rounded-xl text-center hover:border-accent/50 transition-all group"
                           >
                             <item.icon className="w-5 h-5 text-accent mx-auto mb-1.5 group-hover:scale-110 transition-transform" />
@@ -756,7 +763,7 @@ export function DatasetDashboardPage() {
                   <h3 className="text-lg font-semibold text-fg-0">Confirm Operation</h3>
                   <p className="text-sm text-fg-2 mt-1">
                     {confirmCleanDialog.operation === 'remove_missing' && 'Remove all rows with missing values?'}
-                    {confirmCleanDialog.operation === 'fill_missing' && 'Fill missing values with mode/mean/median?'}
+                    {confirmCleanDialog.operation === 'fill_missing' && `Apply ${confirmCleanDialog.label}?`}
                     {confirmCleanDialog.operation === 'remove_duplicates' && 'Remove all duplicate rows?'}
                     {confirmCleanDialog.operation === 'trim_spaces' && 'Trim whitespace from all string columns?'}
                     {confirmCleanDialog.operation === 'normalize' && 'Normalize numeric columns (0-1 range)?'}

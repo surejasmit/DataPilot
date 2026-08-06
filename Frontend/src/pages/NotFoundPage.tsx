@@ -1,6 +1,5 @@
 import { motion } from 'framer-motion'
 import { Link } from 'react-router-dom'
-import { cn } from '@/lib/utils'
 import { Button } from '@/components/ui/Button'
 import { Home, Search, RefreshCw, ArrowLeft } from 'lucide-react'
 

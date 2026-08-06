@@ -19,3 +19,4 @@ export {
   DropdownMenuGroup,
   DropdownMenuShortcut,
 } from './DropdownMenu'
+export { BusinessDomainBadge, getDomainFromProjectName } from './BusinessDomainBadge'

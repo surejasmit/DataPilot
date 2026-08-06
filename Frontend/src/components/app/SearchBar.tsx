@@ -1,62 +1,72 @@
 import { useState, useRef, useEffect, useMemo } from 'react'
-import { Search, X, Command, ArrowUp, ArrowDown, Home, FolderOpen, Lightbulb, Zap } from 'lucide-react'
+import { useNavigate } from 'react-router-dom'
+import { Search, X, FolderOpen, Zap } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { Button } from '@/components/ui/Button'
 import { Input } from '@/components/ui/Input'
+import { api, Project } from '@/lib/api'
 
 interface SearchResult {
   id: string
-  type: 'project' | 'dataset' | 'insight' | 'action'
+  type: 'project' | 'action'
   title: string
   description: string
   shortcut?: string
   route?: string
 }
 
-const mockResults: SearchResult[] = [
-  { id: '1', type: 'project', title: 'Sales Analysis Q1 2026', description: 'Revenue trends and regional breakdown', route: '/projects/1' },
-  { id: '2', type: 'project', title: 'Customer Churn Prediction', description: 'ML model for retention analysis', route: '/projects/2' },
-  { id: '3', type: 'project', title: 'Marketing Campaign ROI', description: 'Channel performance and attribution', route: '/projects/3' },
-  { id: '4', type: 'dataset', title: 'sales_2026.csv', description: '12,480 rows × 14 columns', route: '/projects/1/dataset' },
-  { id: '5', type: 'dataset', title: 'customer_data.xlsx', description: '8,234 rows × 22 columns', route: '/projects/2/dataset' },
-  { id: '6', type: 'dataset', title: 'products.json', description: '1,542 rows × 8 columns', route: '/projects/3/dataset' },
-  { id: '7', type: 'insight', title: 'West region revenue +18.4%', description: 'Statistically significant growth detected', route: '/insights/1' },
-  { id: '8', type: 'insight', title: 'Missing values in Age column', description: '124 nulls (1.0%) - median imputation recommended', route: '/insights/2' },
-  { id: '9', type: 'insight', title: 'Duplicate rows detected', description: '18 exact duplicates found', route: '/insights/3' },
-  { id: '10', type: 'action', title: 'Create new project', description: 'Start analyzing a new dataset', shortcut: '⌘N', route: '/projects/new' },
-  { id: '11', type: 'action', title: 'Ask AI a question', description: 'Query your data in natural language', shortcut: '⌘K', route: '/ask-ai' },
-  { id: '12', type: 'action', title: 'Generate insights', description: 'Auto-discover patterns in active dataset', shortcut: '⌘I', route: '/insights' },
-]
-
 const typeIcons = {
   project: <FolderOpen className="w-4 h-4 text-data-2" />,
-  dataset: <Home className="w-4 h-4 text-data-1" />,
-  insight: <Lightbulb className="w-4 h-4 text-data-3" />,
   action: <Zap className="w-4 h-4 text-accent" />,
 }
 
 const typeLabels = {
   project: 'Projects',
-  dataset: 'Datasets',
-  insight: 'Insights',
   action: 'Actions',
 }
 
+const actionResults: SearchResult[] = [
+  { id: 'action-1', type: 'action', title: 'Create new project', description: 'Start analyzing a new dataset', shortcut: '⌘N', route: '/projects/new' },
+  { id: 'action-2', type: 'action', title: 'Ask AI a question', description: 'Query your data in natural language', shortcut: '⌘K', route: '/ask-ai' },
+  { id: 'action-3', type: 'action', title: 'View insights', description: 'Auto-discover patterns in active dataset', route: '/insights' },
+]
+
 export function SearchBar() {
+  const navigate = useNavigate()
   const [query, setQuery] = useState('')
   const [selectedIndex, setSelectedIndex] = useState(0)
   const [isOpen, setIsOpen] = useState(false)
+  const [projects, setProjects] = useState<Project[]>([])
   const inputRef = useRef<HTMLInputElement>(null)
   const resultsRef = useRef<HTMLDivElement>(null)
 
+  useEffect(() => {
+    api.projects.getAll()
+      .then(setProjects)
+      .catch(() => {})
+  }, [])
+
+  const projectResults: SearchResult[] = useMemo(() => {
+    return projects.map(p => ({
+      id: String(p.id),
+      type: 'project' as const,
+      title: p.name,
+      description: p.dataset_name || p.description || 'No dataset',
+      route: `/projects/${p.id}`,
+    }))
+  }, [projects])
+
+  const allResults = useMemo(() => [...projectResults, ...actionResults], [projectResults])
+
   const filteredResults = useMemo(() => {
-    if (!query.trim()) return mockResults.slice(0, 6)
-    return mockResults.filter(
-      (r) =>
-        r.title.toLowerCase().includes(query.toLowerCase()) ||
-        r.description.toLowerCase().includes(query.toLowerCase())
+    if (!query.trim()) return allResults.slice(0, 8)
+    const q = query.toLowerCase()
+    return allResults.filter(
+      r =>
+        r.title.toLowerCase().includes(q) ||
+        r.description.toLowerCase().includes(q)
     )
-  }, [query])
+  }, [query, allResults])
 
   useEffect(() => {
     function handleKeyDown(e: KeyboardEvent) {
@@ -97,7 +107,7 @@ export function SearchBar() {
       e.preventDefault()
       const selected = filteredResults[selectedIndex]
       if (selected?.route) {
-        window.location.href = selected.route
+        navigate(selected.route)
       }
       setIsOpen(false)
       setQuery('')
@@ -114,6 +124,12 @@ export function SearchBar() {
   const handleClear = () => {
     setQuery('')
     inputRef.current?.focus()
+  }
+
+  const handleResultClick = (route: string) => {
+    navigate(route)
+    setIsOpen(false)
+    setQuery('')
   }
 
   const groupedResults = useMemo(() => {
@@ -181,9 +197,7 @@ export function SearchBar() {
                     : 'hover:bg-bg-2 text-fg-0'
                 )}
                 onClick={() => {
-                  if (result.route) window.location.href = result.route
-                  setIsOpen(false)
-                  setQuery('')
+                  if (result.route) handleResultClick(result.route)
                 }}
                 onMouseEnter={() => setSelectedIndex(filteredResults.indexOf(result))}
               >
@@ -216,7 +230,7 @@ export function SearchBar() {
           <button
             className="w-full flex items-center justify-center gap-2 px-3 py-2 text-sm font-medium text-accent hover:bg-accent-bg/20 rounded-lg transition-colors"
             onClick={() => {
-              window.location.href = '/projects/new'
+              navigate('/projects/new')
               setIsOpen(false)
               setQuery('')
             }}

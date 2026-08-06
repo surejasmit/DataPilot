@@ -47,6 +47,11 @@ export function AuthVisual() {
       <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_bottom_left,_var(--color-data-3)_0%,_transparent_60%)] opacity-5" />
 
       <div className="absolute top-[40%] left-1/2 -translate-x-1/2 -translate-y-1/2 flex flex-col items-center gap-4 z-10">
+        <div className="text-center mb-4">
+          <p className="text-xl font-semibold text-fg-0">DataPilot AI</p>
+          <p className="text-sm text-fg-2">Business Intelligence Platform</p>
+        </div>
+
         <AnimatePresence mode="wait">
           <motion.div
             key={activeStage}
@@ -82,7 +87,7 @@ export function AuthVisual() {
                     className="text-center"
                   >
                     <p className="font-medium text-fg-0 text-base">{stages[activeStage].label}</p>
-                    <p className="text-sm text-fg-2 mt-1">Processing your data...</p>
+                    <p className="text-sm text-fg-2 mt-1">Analyzing your data...</p>
                   </motion.div>
                 </AnimatePresence>
 
@@ -144,8 +149,6 @@ export function AuthVisual() {
           ))}
         </div>
       </div>
-
-
     </div>
   )
 }

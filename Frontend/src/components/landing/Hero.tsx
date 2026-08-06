@@ -1,6 +1,6 @@
-import { useRef } from 'react'
+import { useRef, useState, useEffect } from 'react'
 import { motion } from 'framer-motion'
-import { useIntersectionObserver, useReducedMotion } from '@/hooks/useMedia'
+import { useReducedMotion } from '@/hooks/useMedia'
 import { cn } from '@/lib/utils'
 import { Badge, Link, Button } from '@/components/ui'
 import {
@@ -14,8 +14,8 @@ import {
 
 const stages = [
   {
-    title: 'Raw Dataset',
-    subtitle: 'Upload & Profile',
+    title: 'Upload Business Data',
+    subtitle: 'CSV, Excel, JSON, Parquet',
     icon: (
       <FileSpreadsheet className="w-6 h-6 text-data-1" aria-hidden="true" />
     ),
@@ -40,8 +40,8 @@ const stages = [
     ),
   },
   {
-    title: 'Issues Detected',
-    subtitle: 'Quality Profile',
+    title: 'AI-Powered Analysis',
+    subtitle: 'Quality Assessment',
     icon: (
       <AlertTriangle className="w-6 h-6 text-warning" aria-hidden="true" />
     ),
@@ -72,8 +72,8 @@ const stages = [
     ),
   },
   {
-    title: 'Cleaning Applied',
-    subtitle: 'Interactive Fix',
+    title: 'Interactive Fix',
+    subtitle: 'Data Cleaning',
     icon: (
       <Wand2 className="w-6 h-6 text-accent" aria-hidden="true" />
     ),
@@ -94,8 +94,8 @@ const stages = [
     ),
   },
   {
-    title: 'Insight Generated',
-    subtitle: 'Auto-Discovered',
+    title: 'Business Insights',
+    subtitle: 'KPIs, Trends, Anomalies',
     icon: (
       <Lightbulb className="w-6 h-6 text-data-3" aria-hidden="true" />
     ),
@@ -117,8 +117,8 @@ const stages = [
     ),
   },
   {
-    title: 'Dashboard Built',
-    subtitle: 'Auto-Generated',
+    title: 'Visualize & Report',
+    subtitle: 'Charts, PDF Reports',
     icon: (
       <BarChart3 className="w-6 h-6 text-data-2" aria-hidden="true" />
     ),
@@ -158,7 +158,7 @@ const stages = [
 ]
 
 export function Hero() {
-  const heroRef = useRef<HTMLSectionElement>(null)
+  const heroRef = useRef<HTMLElement>(null)
   const prefersReduced = useReducedMotion()
   const [isVisible, setIsVisible] = useState(false)
   const [activeStage, setActiveStage] = useState(0)
@@ -196,18 +196,16 @@ export function Hero() {
                 <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-accent opacity-75" />
                 <span className="relative inline-flex rounded-full h-2 w-2 bg-accent" />
               </span>
-              New: Interactive Cleaning + Auto-Dashboards
+              Business Intelligence & Analytics Platform
             </div>
 
             <h1 className="text-5xl md:text-6xl lg:text-7xl font-light text-fg-0 tracking-tight leading-[1.05]">
-              Turn messy datasets into{' '}
-              <span className="font-medium">answers you can act on</span>
+              DataPilot AI
             </h1>
 
             <p className="text-lg md:text-xl text-fg-1 max-w-xl leading-relaxed">
-              Upload a dataset. DataPilot profiles it, detects quality issues, recommends fixes you control,
-              discovers patterns, generates dashboards, and answers questions — all backed by real calculations,
-              not guesses.
+              Transform your business data into actionable insights. Upload datasets, discover patterns,
+              generate reports, and make data-driven decisions.
             </p>
 
             <div className="flex flex-wrap items-center gap-4 pt-4">
@@ -311,5 +309,3 @@ export function Hero() {
     </section>
   )
 }
-
-import { useState, useEffect } from 'react'

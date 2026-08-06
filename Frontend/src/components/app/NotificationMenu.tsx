@@ -1,9 +1,7 @@
-import { Bell, X, Mail, AlertTriangle, CheckCircle, Clock } from 'lucide-react'
+import { useState } from 'react'
+import { Bell, X, Mail, AlertTriangle, CheckCircle } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { Button } from '@/components/ui/Button'
-import { Avatar } from '@/components/ui/Avatar'
-import { Badge } from '@/components/ui/Badge'
-import { Separator } from '@/components/ui/Separator'
 import {
   DropdownMenu,
   DropdownMenuTrigger,
@@ -22,7 +20,7 @@ interface Notification {
   read: boolean
 }
 
-const mockNotifications: Notification[] = [
+const initialNotifications: Notification[] = [
   {
     id: '1',
     type: 'success',
@@ -73,7 +71,17 @@ const typeIcons = {
 }
 
 export function NotificationMenu() {
-  const unreadCount = mockNotifications.filter((n) => !n.read).length
+  const [notifications, setNotifications] = useState<Notification[]>(initialNotifications)
+
+  const unreadCount = notifications.filter((n) => !n.read).length
+
+  const handleMarkAllRead = () => {
+    setNotifications(prev => prev.map(n => ({ ...n, read: true })))
+  }
+
+  const handleDismiss = (id: string) => {
+    setNotifications(prev => prev.filter(n => n.id !== id))
+  }
 
   return (
     <DropdownMenu>
@@ -87,47 +95,54 @@ export function NotificationMenu() {
           )}
         </Button>
       </DropdownMenuTrigger>
-      <DropdownMenuContent align="end" className="w-80 max-w-[380px] p-0">
+      <DropdownMenuContent align="right" className="w-80 max-w-[380px] p-0">
         <DropdownMenuLabel className="flex items-center justify-between px-4 py-3 border-b border-border-1">
           <span className="font-medium text-fg-0">Notifications</span>
           {unreadCount > 0 && (
-            <Button variant="ghost" size="sm" className="text-xs text-fg-2 hover:text-fg-0">
+            <Button variant="ghost" size="sm" className="text-xs text-fg-2 hover:text-fg-0" onClick={handleMarkAllRead}>
               Mark all read
             </Button>
           )}
         </DropdownMenuLabel>
 
         <div className="max-h-96 overflow-y-auto">
-          {mockNotifications.map((notification) => (
-            <DropdownMenuItem
-              key={notification.id}
-              className={cn(
-                'p-4 gap-3 hover:bg-bg-2',
-                !notification.read && 'bg-accent-bg/20'
-              )}
-              onClick={() => {}}
-              inset
-            >
-              <div className="flex-shrink-0 w-8 h-8 rounded-lg flex items-center justify-center">
-                {typeIcons[notification.type]}
-              </div>
-              <div className="flex-1 min-w-0">
-                <p className={cn('text-sm font-medium text-fg-0', !notification.read && 'font-semibold')}>
-                  {notification.title}
-                </p>
-                <p className="text-xs text-fg-2 mt-0.5 truncate">{notification.description}</p>
-                <p className="text-[11px] text-fg-3 mt-1">{notification.time}</p>
-              </div>
-              {!notification.read && (
-                <div className="w-2 h-2 rounded-full bg-accent flex-shrink-0 mt-1" />
-              )}
-            </DropdownMenuItem>
-          ))}
+          {notifications.length === 0 ? (
+            <div className="p-6 text-center text-fg-2">
+              <Bell className="w-8 h-8 mx-auto mb-2 opacity-30" />
+              <p className="text-sm">No notifications</p>
+            </div>
+          ) : (
+            notifications.map((notification) => (
+              <DropdownMenuItem
+                key={notification.id}
+                className={cn(
+                  'p-4 gap-3 hover:bg-bg-2 group',
+                  !notification.read && 'bg-accent-bg/20'
+                )}
+                onClick={() => handleDismiss(notification.id)}
+                inset
+              >
+                <div className="flex-shrink-0 w-8 h-8 rounded-lg flex items-center justify-center">
+                  {typeIcons[notification.type]}
+                </div>
+                <div className="flex-1 min-w-0">
+                  <p className={cn('text-sm font-medium text-fg-0', !notification.read && 'font-semibold')}>
+                    {notification.title}
+                  </p>
+                  <p className="text-xs text-fg-2 mt-0.5 truncate">{notification.description}</p>
+                  <p className="text-[11px] text-fg-3 mt-1">{notification.time}</p>
+                </div>
+                {!notification.read && (
+                  <div className="w-2 h-2 rounded-full bg-accent flex-shrink-0 mt-1" />
+                )}
+              </DropdownMenuItem>
+            ))
+          )}
         </div>
 
         <DropdownMenuSeparator />
-        <DropdownMenuItem className="px-4 py-3 text-center text-sm text-accent hover:bg-accent-bg/20" onClick={() => {}}>
-          View all notifications
+        <DropdownMenuItem className="px-4 py-3 text-center text-sm text-fg-2 hover:text-fg-0 cursor-default" onClick={() => {}}>
+          All notifications shown
         </DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>

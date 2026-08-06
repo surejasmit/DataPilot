@@ -81,6 +81,21 @@ class PythonAnalysisService {
     }
   }
 
+  async validateDataset(filePath, fileName) {
+    try {
+      const response = await this.client.post('/validate', {
+        file_path: filePath,
+        file_name: fileName,
+      });
+      return response.data;
+    } catch (error) {
+      if (error.response) {
+        throw new Error(`Python service error: ${error.response.status} - ${JSON.stringify(error.response.data)}`);
+      }
+      throw new Error(`Failed to call Python validation service: ${error.message}`);
+    }
+  }
+
   async healthCheck() {
     try {
       const response = await this.client.get('/health', { timeout: 5000 });
@@ -127,6 +142,31 @@ class PythonAnalysisService {
       throw new Error(`Failed to call Python report service: ${error.message}`);
     }
   }
+
+  async trainModels() {
+    try {
+      const response = await this.client.post('/ml/train');
+      return response.data;
+    } catch (error) {
+      if (error.response) {
+        throw new Error(`Python service error: ${error.response.status} - ${JSON.stringify(error.response.data)}`);
+      }
+      throw new Error(`Failed to call Python ML training service: ${error.message}`);
+    }
+  }
+
+  async getMLStatus() {
+    try {
+      const response = await this.client.get('/ml/status');
+      return response.data;
+    } catch (error) {
+      if (error.response) {
+        throw new Error(`Python service error: ${error.response.status} - ${JSON.stringify(error.response.data)}`);
+      }
+      throw new Error(`Failed to call Python ML status service: ${error.message}`);
+    }
+  }
 }
 
 module.exports = new PythonAnalysisService();
+

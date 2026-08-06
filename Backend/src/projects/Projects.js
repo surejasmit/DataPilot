@@ -145,7 +145,25 @@ const deleteProject = async (req, res, pool) => {
   try {
     const userId = req.user.id;
     const projectId = req.params.id;
-    
+
+    const projectResult = await pool.query(
+      'SELECT dataset_path FROM projects WHERE id = $1 AND user_id = $2',
+      [projectId, userId]
+    );
+
+    if (projectResult.rows.length > 0 && projectResult.rows[0].dataset_path) {
+      const fs = require('fs');
+      const path = require('path');
+      try {
+        const filePath = path.resolve(projectResult.rows[0].dataset_path);
+        if (fs.existsSync(filePath)) {
+          fs.unlinkSync(filePath);
+        }
+      } catch (e) {
+        // File cleanup is best-effort
+      }
+    }
+
     const result = await pool.query(
       'DELETE FROM projects WHERE id = $1 AND user_id = $2 RETURNING id',
       [projectId, userId]
