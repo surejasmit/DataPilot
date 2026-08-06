@@ -22,7 +22,7 @@ function backgroundAnalysis(filePath, fileName, projectId, userId) {
       const { profile, column_stats, statistics, chart_recommendations, insights, quality_report, preview_rows } = analysis;
 
       await db.withTransaction(async (client) => {
-        await db.updateProjectDatasetInfo(client, projectId, profile.total_rows, profile.total_columns, fs.statSync(filePath).size);
+        await db.updateProjectDatasetInfo(client, projectId, profile.total_rows ?? profile.totalRows, profile.total_columns ?? profile.totalColumns, fs.statSync(filePath).size);
         await db.insertColumnStats(client, projectId, column_stats);
         await db.insertProfile(client, projectId, profile);
         await db.insertPreviewRows(client, projectId, preview_rows);
@@ -255,7 +255,7 @@ async function confirmCleaningOperation(datasetId, userId, operationId) {
   const { profile, column_stats, statistics, chart_recommendations, preview_rows } = analysis;
 
   await db.withTransaction(async (client) => {
-    await db.updateProjectDatasetInfo(client, datasetId, profile.total_rows, profile.total_columns, dataset.dataset_size);
+    await db.updateProjectDatasetInfo(client, datasetId, profile.total_rows ?? profile.totalRows, profile.total_columns ?? profile.totalColumns, fs.existsSync(fileInfo.dataset_path) ? fs.statSync(fileInfo.dataset_path).size : 0);
     await db.insertColumnStats(client, datasetId, column_stats);
     await db.insertProfile(client, datasetId, profile);
     await db.insertPreviewRows(client, datasetId, preview_rows);
@@ -335,5 +335,6 @@ module.exports = {
   getCleaningHistoryResult,
   generateInsightsForDataset,
   getInsightsResult,
-  askQuestion
+  askQuestion,
+  getDatasetFilePath: db.getDatasetFilePath
 };

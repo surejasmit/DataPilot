@@ -5,18 +5,26 @@ from contextlib import asynccontextmanager
 from app.config import settings
 from app.routes import analysis
 from app.routes import report
+from app.routes import ml_routes
+from app.ml.registry import registry
 
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     print(f"Starting {settings.API_HOST}:{settings.API_PORT}")
+    try:
+        # Load ML models on startup
+        registry.load_models()
+        print("[Lifespan] Loaded available ML models.")
+    except Exception as e:
+        print(f"[Lifespan] Error loading ML models: {e}")
     yield
     print("Shutting down")
 
 
 app = FastAPI(
-    title="DataPilot ML Analysis Service",
-    description="Python FastAPI service for dataset analysis, profiling, insights, and ML",
+    title="DataPilot AI - Business Analytics Platform",
+    description="Python FastAPI service for business data analysis, profiling, domain-specific insights, and ML-powered business analytics",
     version="1.0.0",
     lifespan=lifespan
 )
@@ -31,6 +39,7 @@ app.add_middleware(
 
 app.include_router(analysis.router)
 app.include_router(report.router)
+app.include_router(ml_routes.router)
 
 
 @app.get("/")
@@ -38,10 +47,11 @@ app.include_router(report.router)
 @app.get("/api/v1/health")
 async def root():
     return {
-        "service": "DataPilot ML Analysis Service",
+        "service": "DataPilot AI - Business Analytics Platform",
         "version": "1.0.0",
         "status": "running",
-        "docs": "/docs"
+        "docs": "/docs",
+        "capabilities": ["business_validation", "domain_insights", "kpi_analysis", "pdf_reports"]
     }
 
 

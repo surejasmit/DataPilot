@@ -19,3 +19,83 @@
 [2026-08-03T04:25:23.599Z] [INFO] Upload completed {"fileName":"medical_insurance - medical_insurance.csv","datasetId":41,"userId":1,"durationMs":10}
 [2026-08-03T04:25:23.612Z] [INFO] Analysis started {"datasetId":41,"userId":1}
 [2026-08-03T04:25:24.013Z] [INFO] Analysis completed {"datasetId":41,"userId":1,"durationMs":414}
+[2026-08-03T06:38:49.069Z] [INFO] Server running on port 5000
+[2026-08-03T06:38:49.474Z] [INFO] Database connected successfully
+[2026-08-03T06:56:57.371Z] [INFO] Server running on port 5000
+[2026-08-03T06:56:57.457Z] [INFO] Database connected successfully
+[2026-08-03T07:05:04.818Z] [INFO] Upload started {"fileName":"medical_insurance - medical_insurance.csv","fileSize":0,"userId":2}
+[2026-08-03T07:05:04.840Z] [INFO] Upload completed {"fileName":"medical_insurance - medical_insurance.csv","datasetId":18,"userId":2,"durationMs":20}
+[2026-08-03T07:05:04.841Z] [INFO] Analysis started {"datasetId":18,"userId":2}
+[2026-08-03T07:05:05.192Z] [ERROR] Database error: transaction {"error":"null value in column \"total_rows\" of relation \"dataset_profile\" violates not-null constraint"}
+[2026-08-03T07:05:05.194Z] [ERROR] Analysis failed {"datasetId":18,"error":"null value in column \"total_rows\" of relation \"dataset_profile\" violates not-null constraint","userId":2}
+[2026-08-03T07:20:41.230Z] [INFO] Server running on port 5000
+[2026-08-03T07:20:41.286Z] [INFO] Database connected successfully
+[2026-08-03T07:31:04.899Z] [INFO] Server running on port 5000
+[2026-08-03T07:31:04.967Z] [INFO] Database connected successfully
+[2026-08-03T08:06:33.293Z] [INFO] Server running on port 5000
+[2026-08-03T08:06:33.341Z] [INFO] Database connected successfully
+[2026-08-03T08:25:48.012Z] [INFO] Server running on port 5000
+[2026-08-03T08:25:48.078Z] [INFO] Database connected successfully
+[2026-08-03T08:26:42.070Z] [INFO] Upload started {"fileName":"HR-Employee-Attrition - HR-Employee-Attrition (1).csv","fileSize":0,"userId":2}
+[2026-08-03T08:26:42.079Z] [INFO] Upload completed {"fileName":"HR-Employee-Attrition - HR-Employee-Attrition (1).csv","datasetId":19,"userId":2,"durationMs":7}
+[2026-08-03T08:26:42.081Z] [INFO] Analysis started {"datasetId":19,"userId":2}
+[2026-08-03T08:26:42.090Z] [ERROR] Analysis failed {"datasetId":19,"error":"Failed to call Python analysis service: ","userId":2}
+[2026-08-03T08:26:42.201Z] [ERROR] Failed to generate quality report via Python service {"error":"Failed to call Python analysis service: "}
+[2026-08-03T08:26:42.220Z] [ERROR] Failed to generate quality report via Python service {"error":"Failed to call Python analysis service: "}
+[2026-08-03T10:01:00.433Z] [INFO] Server running on port 5000
+[2026-08-03T10:01:00.743Z] [INFO] Database connected successfully
+[2026-08-03T10:16:22.436Z] [INFO] Server running on port 5000
+[2026-08-03T10:16:22.489Z] [INFO] Database connected successfully
+[2026-08-03T12:12:03.694Z] [INFO] Server running on port 5000
+[2026-08-03T12:12:03.815Z] [INFO] Database connected successfully
+[2026-08-03T12:14:50.200Z] [INFO] Upload started {"fileName":"sales_data.csv","fileSize":0,"userId":2}
+[2026-08-03T12:14:50.262Z] [INFO] Upload completed {"fileName":"sales_data.csv","datasetId":20,"userId":2,"durationMs":54}
+[2026-08-03T12:14:50.268Z] [INFO] Analysis started {"datasetId":20,"userId":2}
+[2026-08-03T12:14:52.215Z] [ERROR] Database error: transaction {"error":"null value in column \"total_rows\" of relation \"dataset_profile\" violates not-null constraint"}
+[2026-08-03T12:14:52.218Z] [ERROR] Analysis failed {"datasetId":20,"error":"null value in column \"total_rows\" of relation \"dataset_profile\" violates not-null constraint","userId":2}
+[2026-08-03T12:29:58.546Z] [INFO] Server running on port 5000
+[2026-08-03T12:29:58.619Z] [INFO] Database connected successfully
+[2026-08-03T12:32:18.400Z] [INFO] Server running on port 5000
+[2026-08-03T12:32:18.475Z] [INFO] Database connected successfully
+[2026-08-03T12:32:37.644Z] [INFO] Server running on port 5000
+[2026-08-03T12:32:37.717Z] [INFO] Database connected successfully
+[2026-08-03T12:32:44.797Z] [INFO] Server running on port 5000
+[2026-08-03T12:32:44.872Z] [INFO] Database connected successfully
+[2026-08-03T12:33:17.596Z] [ERROR] Global error handler {"error":"logger is not defined","stack":"ReferenceError: logger is not defined\n    at getSuggestedQuestions (D:\\sem5-project\\Backend\\src\\controllers\\datasetController.js:255:5)\n    at Layer.handleRequest (D:\\sem5-project\\Backend\\node_modules\\router\\lib\\layer.js:152:17)\n    at next (D:\\sem5-project\\Backend\\node_modules\\router\\lib\\route.js:157:13)\n    at authMiddleware (D:\\sem5-project\\Backend\\src\\auth\\authMiddleware.js:22:5)\n    at process.processTicksAndRejections (node:internal/process/task_queues:103:5)"}
+[2026-08-03T12:33:17.605Z] [ERROR] Global error handler {"error":"logger is not defined","stack":"ReferenceError: logger is not defined\n    at getSuggestedQuestions (D:\\sem5-project\\Backend\\src\\controllers\\datasetController.js:255:5)\n    at Layer.handleRequest (D:\\sem5-project\\Backend\\node_modules\\router\\lib\\layer.js:152:17)\n    at next (D:\\sem5-project\\Backend\\node_modules\\router\\lib\\route.js:157:13)\n    at authMiddleware (D:\\sem5-project\\Backend\\src\\auth\\authMiddleware.js:22:5)\n    at process.processTicksAndRejections (node:internal/process/task_queues:103:5)"}
+[2026-08-03T12:33:18.601Z] [ERROR] Global error handler {"error":"logger is not defined","stack":"ReferenceError: logger is not defined\n    at askQuestion (D:\\sem5-project\\Backend\\src\\controllers\\datasetController.js:240:5)\n    at process.processTicksAndRejections (node:internal/process/task_queues:103:5)"}
+[2026-08-03T12:33:23.367Z] [ERROR] Global error handler {"error":"logger is not defined","stack":"ReferenceError: logger is not defined\n    at getSuggestedQuestions (D:\\sem5-project\\Backend\\src\\controllers\\datasetController.js:255:5)\n    at Layer.handleRequest (D:\\sem5-project\\Backend\\node_modules\\router\\lib\\layer.js:152:17)\n    at next (D:\\sem5-project\\Backend\\node_modules\\router\\lib\\route.js:157:13)\n    at authMiddleware (D:\\sem5-project\\Backend\\src\\auth\\authMiddleware.js:22:5)\n    at process.processTicksAndRejections (node:internal/process/task_queues:103:5)"}
+[2026-08-03T12:33:23.847Z] [ERROR] Global error handler {"error":"logger is not defined","stack":"ReferenceError: logger is not defined\n    at getSuggestedQuestions (D:\\sem5-project\\Backend\\src\\controllers\\datasetController.js:255:5)\n    at Layer.handleRequest (D:\\sem5-project\\Backend\\node_modules\\router\\lib\\layer.js:152:17)\n    at next (D:\\sem5-project\\Backend\\node_modules\\router\\lib\\route.js:157:13)\n    at authMiddleware (D:\\sem5-project\\Backend\\src\\auth\\authMiddleware.js:22:5)\n    at process.processTicksAndRejections (node:internal/process/task_queues:103:5)"}
+[2026-08-03T12:33:25.156Z] [ERROR] Global error handler {"error":"logger is not defined","stack":"ReferenceError: logger is not defined\n    at askQuestion (D:\\sem5-project\\Backend\\src\\controllers\\datasetController.js:240:5)\n    at process.processTicksAndRejections (node:internal/process/task_queues:103:5)"}
+[2026-08-03T12:33:27.986Z] [ERROR] Global error handler {"error":"logger is not defined","stack":"ReferenceError: logger is not defined\n    at getSuggestedQuestions (D:\\sem5-project\\Backend\\src\\controllers\\datasetController.js:255:5)\n    at Layer.handleRequest (D:\\sem5-project\\Backend\\node_modules\\router\\lib\\layer.js:152:17)\n    at next (D:\\sem5-project\\Backend\\node_modules\\router\\lib\\route.js:157:13)\n    at authMiddleware (D:\\sem5-project\\Backend\\src\\auth\\authMiddleware.js:22:5)\n    at process.processTicksAndRejections (node:internal/process/task_queues:103:5)"}
+[2026-08-03T12:33:28.014Z] [ERROR] Global error handler {"error":"logger is not defined","stack":"ReferenceError: logger is not defined\n    at getSuggestedQuestions (D:\\sem5-project\\Backend\\src\\controllers\\datasetController.js:255:5)\n    at Layer.handleRequest (D:\\sem5-project\\Backend\\node_modules\\router\\lib\\layer.js:152:17)\n    at next (D:\\sem5-project\\Backend\\node_modules\\router\\lib\\route.js:157:13)\n    at authMiddleware (D:\\sem5-project\\Backend\\src\\auth\\authMiddleware.js:22:5)\n    at process.processTicksAndRejections (node:internal/process/task_queues:103:5)"}
+[2026-08-03T12:33:29.056Z] [ERROR] Global error handler {"error":"logger is not defined","stack":"ReferenceError: logger is not defined\n    at askQuestion (D:\\sem5-project\\Backend\\src\\controllers\\datasetController.js:240:5)\n    at process.processTicksAndRejections (node:internal/process/task_queues:103:5)"}
+[2026-08-03T12:33:31.391Z] [ERROR] Global error handler {"error":"logger is not defined","stack":"ReferenceError: logger is not defined\n    at getSuggestedQuestions (D:\\sem5-project\\Backend\\src\\controllers\\datasetController.js:255:5)\n    at Layer.handleRequest (D:\\sem5-project\\Backend\\node_modules\\router\\lib\\layer.js:152:17)\n    at next (D:\\sem5-project\\Backend\\node_modules\\router\\lib\\route.js:157:13)\n    at authMiddleware (D:\\sem5-project\\Backend\\src\\auth\\authMiddleware.js:22:5)\n    at process.processTicksAndRejections (node:internal/process/task_queues:103:5)"}
+[2026-08-03T12:33:32.138Z] [ERROR] Global error handler {"error":"logger is not defined","stack":"ReferenceError: logger is not defined\n    at askQuestion (D:\\sem5-project\\Backend\\src\\controllers\\datasetController.js:240:5)\n    at process.processTicksAndRejections (node:internal/process/task_queues:103:5)"}
+[2026-08-03T12:33:33.102Z] [ERROR] Global error handler {"error":"logger is not defined","stack":"ReferenceError: logger is not defined\n    at getSuggestedQuestions (D:\\sem5-project\\Backend\\src\\controllers\\datasetController.js:255:5)\n    at Layer.handleRequest (D:\\sem5-project\\Backend\\node_modules\\router\\lib\\layer.js:152:17)\n    at next (D:\\sem5-project\\Backend\\node_modules\\router\\lib\\route.js:157:13)\n    at authMiddleware (D:\\sem5-project\\Backend\\src\\auth\\authMiddleware.js:22:5)\n    at process.processTicksAndRejections (node:internal/process/task_queues:103:5)"}
+[2026-08-03T12:33:33.468Z] [ERROR] Global error handler {"error":"logger is not defined","stack":"ReferenceError: logger is not defined\n    at getSuggestedQuestions (D:\\sem5-project\\Backend\\src\\controllers\\datasetController.js:255:5)\n    at Layer.handleRequest (D:\\sem5-project\\Backend\\node_modules\\router\\lib\\layer.js:152:17)\n    at next (D:\\sem5-project\\Backend\\node_modules\\router\\lib\\route.js:157:13)\n    at authMiddleware (D:\\sem5-project\\Backend\\src\\auth\\authMiddleware.js:22:5)\n    at process.processTicksAndRejections (node:internal/process/task_queues:103:5)"}
+[2026-08-03T12:33:57.064Z] [ERROR] Global error handler {"error":"logger is not defined","stack":"ReferenceError: logger is not defined\n    at askQuestion (D:\\sem5-project\\Backend\\src\\controllers\\datasetController.js:240:5)\n    at process.processTicksAndRejections (node:internal/process/task_queues:103:5)"}
+[2026-08-03T14:37:00.872Z] [INFO] Server running on port 5000
+[2026-08-03T14:37:01.020Z] [INFO] Database connected successfully
+[2026-08-03T14:38:20.853Z] [ERROR] Global error handler {"error":"logger is not defined","stack":"ReferenceError: logger is not defined\n    at getSuggestedQuestions (D:\\sem5-project\\Backend\\src\\controllers\\datasetController.js:255:5)\n    at Layer.handleRequest (D:\\sem5-project\\Backend\\node_modules\\router\\lib\\layer.js:152:17)\n    at next (D:\\sem5-project\\Backend\\node_modules\\router\\lib\\route.js:157:13)\n    at authMiddleware (D:\\sem5-project\\Backend\\src\\auth\\authMiddleware.js:22:5)\n    at process.processTicksAndRejections (node:internal/process/task_queues:103:5)"}
+[2026-08-03T14:38:20.898Z] [ERROR] Global error handler {"error":"logger is not defined","stack":"ReferenceError: logger is not defined\n    at getSuggestedQuestions (D:\\sem5-project\\Backend\\src\\controllers\\datasetController.js:255:5)\n    at Layer.handleRequest (D:\\sem5-project\\Backend\\node_modules\\router\\lib\\layer.js:152:17)\n    at next (D:\\sem5-project\\Backend\\node_modules\\router\\lib\\route.js:157:13)\n    at authMiddleware (D:\\sem5-project\\Backend\\src\\auth\\authMiddleware.js:22:5)\n    at process.processTicksAndRejections (node:internal/process/task_queues:103:5)"}
+[2026-08-03T14:38:22.827Z] [ERROR] Global error handler {"error":"logger is not defined","stack":"ReferenceError: logger is not defined\n    at askQuestion (D:\\sem5-project\\Backend\\src\\controllers\\datasetController.js:240:5)\n    at process.processTicksAndRejections (node:internal/process/task_queues:103:5)"}
+[2026-08-03T14:38:48.002Z] [INFO] Upload started {"fileName":"sales_data.csv","fileSize":0,"userId":2}
+[2026-08-03T14:38:48.020Z] [INFO] Upload completed {"fileName":"sales_data.csv","datasetId":21,"userId":2,"durationMs":14}
+[2026-08-03T14:38:48.024Z] [INFO] Analysis started {"datasetId":21,"userId":2}
+[2026-08-03T14:38:50.703Z] [INFO] Analysis completed {"datasetId":21,"userId":2,"durationMs":2683}
+[2026-08-03T14:39:09.788Z] [ERROR] Global error handler {"error":"logger is not defined","stack":"ReferenceError: logger is not defined\n    at getSuggestedQuestions (D:\\sem5-project\\Backend\\src\\controllers\\datasetController.js:255:5)\n    at Layer.handleRequest (D:\\sem5-project\\Backend\\node_modules\\router\\lib\\layer.js:152:17)\n    at next (D:\\sem5-project\\Backend\\node_modules\\router\\lib\\route.js:157:13)\n    at authMiddleware (D:\\sem5-project\\Backend\\src\\auth\\authMiddleware.js:22:5)\n    at process.processTicksAndRejections (node:internal/process/task_queues:103:5)"}
+[2026-08-03T14:39:09.799Z] [ERROR] Global error handler {"error":"logger is not defined","stack":"ReferenceError: logger is not defined\n    at getSuggestedQuestions (D:\\sem5-project\\Backend\\src\\controllers\\datasetController.js:255:5)\n    at Layer.handleRequest (D:\\sem5-project\\Backend\\node_modules\\router\\lib\\layer.js:152:17)\n    at next (D:\\sem5-project\\Backend\\node_modules\\router\\lib\\route.js:157:13)\n    at authMiddleware (D:\\sem5-project\\Backend\\src\\auth\\authMiddleware.js:22:5)\n    at process.processTicksAndRejections (node:internal/process/task_queues:103:5)"}
+[2026-08-03T14:39:15.001Z] [ERROR] Global error handler {"error":"logger is not defined","stack":"ReferenceError: logger is not defined\n    at askQuestion (D:\\sem5-project\\Backend\\src\\controllers\\datasetController.js:240:5)\n    at process.processTicksAndRejections (node:internal/process/task_queues:103:5)"}
+[2026-08-03T14:42:00.225Z] [INFO] Server running on port 5000
+[2026-08-03T14:42:00.438Z] [INFO] Database connected successfully
+[2026-08-03T14:42:19.186Z] [INFO] Server running on port 5000
+[2026-08-03T14:42:19.307Z] [INFO] Database connected successfully
+[2026-08-03T14:43:19.580Z] [ERROR] Error in askQuestion controller {"error":"datasetService.getDatasetFilePath is not a function","stack":"TypeError: datasetService.getDatasetFilePath is not a function\n    at askQuestion (D:\\sem5-project\\Backend\\src\\controllers\\datasetController.js:233:43)\n    at process.processTicksAndRejections (node:internal/process/task_queues:103:5)"}
+[2026-08-03T14:47:18.624Z] [ERROR] Error in askQuestion controller {"error":"datasetService.getDatasetFilePath is not a function","stack":"TypeError: datasetService.getDatasetFilePath is not a function\n    at askQuestion (D:\\sem5-project\\Backend\\src\\controllers\\datasetController.js:233:43)\n    at process.processTicksAndRejections (node:internal/process/task_queues:103:5)"}
+[2026-08-03T14:47:59.191Z] [INFO] Server running on port 5000
+[2026-08-03T14:47:59.351Z] [INFO] Database connected successfully
+[2026-08-03T14:47:59.801Z] [INFO] Server running on port 5000
+[2026-08-03T14:47:59.979Z] [INFO] Database connected successfully
+[2026-08-03T14:48:18.221Z] [INFO] Server running on port 5000
+[2026-08-03T14:48:18.482Z] [INFO] Database connected successfully

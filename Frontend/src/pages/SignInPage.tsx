@@ -1,13 +1,12 @@
 import { useState } from 'react'
-import { Link, useNavigate, useSearchParams } from 'react-router-dom'
+import { useNavigate, useSearchParams } from 'react-router-dom'
 import { motion } from 'framer-motion'
 import { AuthLayout } from '@/components/auth/AuthLayout'
 import { PasswordInput } from '@/components/auth/PasswordInput'
 import { Input } from '@/components/ui/Input'
-import { Label } from '@/components/ui/Label'
 import { Button } from '@/components/ui/Button'
 import { Link as UILink } from '@/components/ui/Link'
-import { Loader2, CheckCircle, AlertCircle } from 'lucide-react'
+import { Loader2, CheckCircle } from 'lucide-react'
 import { api, setAuthToken } from '@/lib/api'
 
 interface FormErrors {
@@ -76,7 +75,7 @@ export function SignInPage() {
   return (
     <AuthLayout
       title="Welcome back"
-      description="Sign in to access your workspaces, datasets, and dashboards."
+      description="Sign in to access your business analytics workspace, datasets, and dashboards."
       sideContent={
         <div className="mt-8 p-4 bg-bg-1 border border-border-1 rounded-xl">
           <p className="text-sm text-fg-1">

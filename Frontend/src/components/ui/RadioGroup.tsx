@@ -18,7 +18,7 @@ interface RadioGroupProps {
   className?: string
 }
 
-const RadioGroup = forwardRef<HTMLFieldSetElement, RadioGroupProps>(
+const RadioGroup = forwardRef<HTMLDivElement, RadioGroupProps>(
   ({ className, value, onValueChange, children, name = 'radio-group', ...props }, ref) => (
     <RadioGroupPrimitive.Root
       ref={ref}

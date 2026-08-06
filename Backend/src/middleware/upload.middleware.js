@@ -19,7 +19,7 @@ const storage = multer.diskStorage({
 });
 
 const fileFilter = (req, file, cb) => {
-  const allowedTypes = ['.csv', '.xlsx', '.xls', '.json'];
+  const allowedTypes = ['.csv', '.xlsx', '.xls', '.json', '.parquet'];
   const ext = path.extname(file.originalname).toLowerCase();
   
   if (allowedTypes.includes(ext)) {
@@ -30,7 +30,7 @@ const fileFilter = (req, file, cb) => {
       extension: ext,
       userId: req.user?.id 
     });
-    cb(new Error('Unsupported file type. Only CSV, Excel, and JSON files are allowed.'), false);
+    cb(new Error('Unsupported file type. Only CSV, Excel, JSON, and Parquet files are allowed.'), false);
   }
 };
 

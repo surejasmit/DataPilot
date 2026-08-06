@@ -51,11 +51,17 @@ async function updateProjectDatasetInfo(client, projectId, totalRows, totalColum
   );
 }
 
+function safeNumeric(val) {
+  if (val === null || val === undefined || val === '') return null;
+  const num = Number(val);
+  return isNaN(num) ? null : num;
+}
+
 async function insertColumnStats(client, datasetId, columns) {
   for (let idx = 0; idx < columns.length; idx++) {
     const col = columns[idx];
-    const colName = (col.columnName !== null && col.columnName !== undefined && String(col.columnName).trim() !== '') 
-      ? String(col.columnName) 
+    const colName = (col.columnName !== null && col.columnName !== undefined && String(col.columnName).trim() !== '')
+      ? String(col.columnName)
       : (col.column_name ? String(col.column_name) : `column_${idx + 1}`);
     await client.query(
       `INSERT INTO dataset_columns 
@@ -82,10 +88,12 @@ async function insertColumnStats(client, datasetId, columns) {
         is_datetime = EXCLUDED.is_datetime,
         is_boolean = EXCLUDED.is_boolean,
         updated_at = CURRENT_TIMESTAMP`,
-      [datasetId, colName, col.data_type || col.dataType || 'string', col.position || idx, col.missing_count ?? col.missingCount ?? 0,
-       col.missing_percentage ?? col.missingPercentage ?? 0, col.unique_count ?? col.uniqueCount ?? 0, col.min_value ?? col.minValue ?? null, col.max_value ?? col.maxValue ?? null, col.mean_value ?? col.meanValue ?? null,
-       col.median_value ?? col.medianValue ?? null, col.mode_value ?? col.modeValue ?? null, col.std_dev ?? col.stdDev ?? null, col.q1 ?? null, col.q3 ?? null,
-       !!(col.is_numeric ?? col.isNumeric), !!(col.is_categorical ?? col.isCategorical), !!(col.is_datetime ?? col.isDatetime), !!(col.is_boolean ?? col.isBoolean)]
+      [datasetId, colName, col.data_type || col.dataType || 'string', col.position ?? idx, col.missing_count ?? col.missingCount ?? 0,
+        safeNumeric(col.missing_percentage ?? col.missingPercentage) ?? 0, col.unique_count ?? col.uniqueCount ?? 0,
+        safeNumeric(col.min_value ?? col.minValue), safeNumeric(col.max_value ?? col.maxValue), safeNumeric(col.mean_value ?? col.meanValue),
+        safeNumeric(col.median_value ?? col.medianValue), col.mode_value ?? col.modeValue ? String(col.mode_value ?? col.modeValue) : null,
+        safeNumeric(col.std_dev ?? col.stdDev), safeNumeric(col.q1), safeNumeric(col.q3),
+        !!(col.is_numeric ?? col.isNumeric), !!(col.is_categorical ?? col.isCategorical), !!(col.is_datetime ?? col.isDatetime), !!(col.is_boolean ?? col.isBoolean)]
     );
   }
 }
@@ -117,14 +125,24 @@ async function insertProfile(client, datasetId, profileData) {
       processing_time_ms = EXCLUDED.processing_time_ms,
       status = EXCLUDED.status,
       updated_at = CURRENT_TIMESTAMP`,
-    [datasetId, profileData.totalRows, profileData.totalColumns,
-     profileData.missingValuesTotal, profileData.missingPercentage,
-     profileData.duplicateRows, profileData.duplicatePercentage,
-     profileData.emptyColumns, profileData.numericColumns,
-     profileData.categoricalColumns, profileData.datetimeColumns,
-     profileData.booleanColumns, profileData.memoryUsageBytes,
-     profileData.datasetSizeBytes, profileData.datasetShape,
-     profileData.fileEncoding, profileData.processingTimeMs, profileData.status]
+    [datasetId,
+      profileData.total_rows ?? profileData.totalRows ?? 0,
+      profileData.total_columns ?? profileData.totalColumns ?? 0,
+      profileData.missing_values_total ?? profileData.missingValuesTotal ?? 0,
+      safeNumeric(profileData.missing_percentage ?? profileData.missingPercentage) ?? 0,
+      profileData.duplicate_rows ?? profileData.duplicateRows ?? 0,
+      safeNumeric(profileData.duplicate_percentage ?? profileData.duplicatePercentage) ?? 0,
+      profileData.empty_columns ?? profileData.emptyColumns ?? 0,
+      profileData.numeric_columns ?? profileData.numericColumns ?? 0,
+      profileData.categorical_columns ?? profileData.categoricalColumns ?? 0,
+      profileData.datetime_columns ?? profileData.datetimeColumns ?? 0,
+      profileData.boolean_columns ?? profileData.booleanColumns ?? 0,
+      profileData.memory_usage_bytes ?? profileData.memoryUsageBytes ?? 0,
+      profileData.dataset_size_bytes ?? profileData.datasetSizeBytes ?? 0,
+      profileData.dataset_shape ?? profileData.datasetShape ?? '',
+      profileData.file_encoding ?? profileData.fileEncoding ?? 'UTF-8',
+      profileData.processing_time_ms ?? profileData.processingTimeMs ?? 0,
+      profileData.status || 'completed']
   );
 }
 
@@ -156,10 +174,21 @@ async function insertStatistics(client, datasetId, numericColumns) {
         mode_value, std_dev, variance, q1, q3, iqr, missing_count,
         missing_percentage, unique_count, range_value)
        VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16)`,
-      [datasetId, colName, col.min_value ?? col.minValue ?? null, col.max_value ?? col.maxValue ?? null, col.mean_value ?? col.meanValue ?? null,
-       col.median_value ?? col.medianValue ?? null, col.mode_value ?? col.modeValue ?? null, col.std_dev ?? col.stdDev ?? null, col.variance ?? null, col.q1 ?? null,
-       col.q3 ?? null, col.iqr ?? null, col.missing_count ?? col.missingCount ?? 0, col.missing_percentage ?? col.missingPercentage ?? 0,
-       col.unique_count ?? col.uniqueCount ?? 0, col.range_value ?? col.rangeValue ?? null]
+      [datasetId, colName,
+        safeNumeric(col.min_value ?? col.minValue),
+        safeNumeric(col.max_value ?? col.maxValue),
+        safeNumeric(col.mean_value ?? col.meanValue),
+        safeNumeric(col.median_value ?? col.medianValue),
+        col.mode_value ?? col.modeValue ? String(col.mode_value ?? col.modeValue) : null,
+        safeNumeric(col.std_dev ?? col.stdDev),
+        safeNumeric(col.variance),
+        safeNumeric(col.q1),
+        safeNumeric(col.q3),
+        safeNumeric(col.iqr),
+        col.missing_count ?? col.missingCount ?? 0,
+        safeNumeric(col.missing_percentage ?? col.missingPercentage) ?? 0,
+        col.unique_count ?? col.uniqueCount ?? 0,
+        safeNumeric(col.range_value ?? col.rangeValue)]
     );
   }
 }
@@ -224,9 +253,15 @@ async function getPreview(datasetId, { page = 1, limit = 20, search = '', sortCo
   }
 
   if (sortColumn) {
-    const sanitizedColumn = sortColumn.replace(/['"]/g, '');
-    const sanitizedOrder = sortOrder.toUpperCase() === 'DESC' ? 'DESC' : 'ASC';
-    query += ` ORDER BY row_data->>'${sanitizedColumn}' ${sanitizedOrder}`;
+    const sanitizedColumn = sortColumn.replace(/[^a-zA-Z0-9_]/g, '');
+    if (sanitizedColumn) {
+      const sanitizedOrder = sortOrder.toUpperCase() === 'DESC' ? 'DESC' : 'ASC';
+      query += ` ORDER BY row_data->>'$${paramIndex}' ${sanitizedOrder}`;
+      params.push(sanitizedColumn);
+      paramIndex++;
+    } else {
+      query += ' ORDER BY row_index';
+    }
   } else {
     query += ' ORDER BY row_index';
   }
@@ -315,12 +350,21 @@ async function insertQualityReport(client, dataSetId, report) {
       numeric_columns = EXCLUDED.numeric_columns,
       issues = EXCLUDED.issues,
       updated_at = CURRENT_TIMESTAMP`,
-    [dataSetId, report.totalRows, report.missingValues, report.missingPercentage,
-     report.duplicateRows, report.duplicatePercentage,
-     report.emptyColumns, report.constantColumns, report.mixedTypeColumns,
-     report.outlierColumns, report.highCardinalityColumns,
-     report.dateColumns, report.categoricalColumns, report.numericColumns,
-     JSON.stringify(report.issues)]
+    [dataSetId,
+      report.total_rows ?? report.totalRows ?? 0,
+      report.missing_values ?? report.missingValues ?? 0,
+      safeNumeric(report.missing_percentage ?? report.missingPercentage) ?? 0,
+      report.duplicate_rows ?? report.duplicateRows ?? 0,
+      safeNumeric(report.duplicate_percentage ?? report.duplicatePercentage) ?? 0,
+      report.empty_columns ?? report.emptyColumns ?? [],
+      report.constant_columns ?? report.constantColumns ?? [],
+      report.mixed_type_columns ?? report.mixedTypeColumns ?? [],
+      report.outlier_columns ?? report.outlierColumns ?? [],
+      report.high_cardinality_columns ?? report.highCardinalityColumns ?? [],
+      report.date_columns ?? report.dateColumns ?? [],
+      report.categorical_columns ?? report.categoricalColumns ?? [],
+      report.numeric_columns ?? report.numericColumns ?? [],
+      JSON.stringify(report.issues || [])]
   );
 }
 
@@ -366,7 +410,7 @@ async function insertInsights(client, datasetId, insights) {
       `INSERT INTO dataset_insights (dataset_id, insight_type, title, description, details, severity, confidence)
        VALUES ($1, $2, $3, $4, $5, $6, $7)`,
       [datasetId, insight.type, insight.title, insight.description,
-       JSON.stringify(insight.details || {}), insight.severity || 'info', insight.confidence || 0]
+        JSON.stringify(insight.details || {}), insight.severity || 'info', insight.confidence || 0]
     );
   }
 }

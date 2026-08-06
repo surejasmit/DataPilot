@@ -2,16 +2,28 @@ from fastapi import APIRouter, HTTPException
 from typing import Dict, Any, List
 import json
 
-from app.models.schemas import AnalysisRequest, AnalysisResponse, QuestionRequest, QuestionResponse, CleaningRequest, CleaningResponse
+from app.models.schemas import AnalysisRequest, AnalysisResponse, QuestionRequest, QuestionResponse, CleaningRequest, CleaningResponse, BusinessValidationResponse
 from app.services.analysis.dataset_reader import read_dataset, get_preview_rows, get_columns_info, infer_data_type, resolve_file_path
 from app.services.analysis.profile import generate_profile, get_column_data_types
 from app.services.analysis.statistics import compute_column_statistics, generate_statistics_summary, compute_distribution_analysis, compute_correlation_matrix
 from app.services.analysis.insights import generate_insights
 from app.services.analysis.charts import recommend_charts, get_chart_data
-from app.services.analysis.question_answer import answer_question, generate_suggested_questions, clean_dataset
+from app.services.analysis.question_answer import answer_dataset_question, generate_suggested_questions, clean_dataset
 from app.services.analysis.quality import detect_quality_issues
+from app.services.analysis.business_validation import detect_business_domain
 
 router = APIRouter(prefix="/api/v1", tags=["analysis"])
+
+
+@router.post("/validate", response_model=BusinessValidationResponse)
+async def validate_dataset_endpoint(request: AnalysisRequest):
+    try:
+        file_path = resolve_file_path(request.file_path)
+        df = read_dataset(file_path, request.file_name)
+        validation = detect_business_domain(df)
+        return validation
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
 
 
 def _analyze_dataset(file_path: str, file_name: str, max_rows: int = None) -> Dict[str, Any]:
@@ -39,6 +51,8 @@ def _analyze_dataset(file_path: str, file_name: str, max_rows: int = None) -> Di
     
     quality = detect_quality_issues(df)
     
+    validation = detect_business_domain(df)
+    
     preview_rows = get_preview_rows(df, limit=100)
     
     processing_time = int((time.time() - start_time) * 1000)
@@ -51,7 +65,10 @@ def _analyze_dataset(file_path: str, file_name: str, max_rows: int = None) -> Di
         'insights': insights,
         'quality_report': quality,
         'preview_rows': preview_rows,
-        'processing_time_ms': processing_time
+        'processing_time_ms': processing_time,
+        'domain': validation.get('domain', 'unknown'),
+        'is_business': validation.get('is_business', False),
+        'business_confidence': validation.get('confidence', 0.0),
     }
 
 
@@ -91,7 +108,7 @@ async def clean_dataset_endpoint(request: CleaningRequest):
 @router.post("/question", response_model=QuestionResponse)
 async def ask_question_endpoint(request: QuestionRequest):
     try:
-        result = answer_question(request.file_path, request.file_name, request.question)
+        result = answer_dataset_question(request.file_path, request.file_name, request.question)
         return result
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))

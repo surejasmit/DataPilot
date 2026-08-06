@@ -1,6 +1,5 @@
 import { useState } from 'react'
-import { Link, useNavigate } from 'react-router-dom'
-import { motion } from 'framer-motion'
+import { useNavigate } from 'react-router-dom'
 import { AuthLayout } from '@/components/auth/AuthLayout'
 import { AuthVisual } from '@/components/auth/AuthVisual'
 import { PasswordInput } from '@/components/auth/PasswordInput'
@@ -106,7 +105,7 @@ export function SignUpPage() {
   return (
     <AuthLayout
       title="Create your workspace"
-      description="Start analyzing your data in minutes. Free tier available, no credit card required."
+      description="Start analyzing your business data in minutes. Free tier available, no credit card required."
       backgroundVisual={<AuthVisual />}
     >
       <form onSubmit={handleSubmit} className="space-y-4" noValidate>

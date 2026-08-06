@@ -25,8 +25,8 @@ interface ChartRule {
 
 const chartRules: ChartRule[] = [
   {
-    title: 'Time Series',
-    description: 'Date/Time + Numeric → Line chart with trend',
+    title: 'Revenue Trend',
+    description: 'Date/Time + Numeric → Line chart with trend for tracking business performance over time.',
     columns: ['Date', 'Revenue'],
     chartType: 'Line Chart',
     icon: Activity,
@@ -49,8 +49,8 @@ const chartRules: ChartRule[] = [
     ),
   },
   {
-    title: 'Category Comparison',
-    description: 'Category + Numeric → Bar chart (horizontal for many)',
+    title: 'Sales by Region',
+    description: 'Category + Numeric → Bar chart comparing revenue performance across geographic regions.',
     columns: ['Region', 'Revenue'],
     chartType: 'Bar Chart',
     icon: BarChart3,
@@ -64,56 +64,33 @@ const chartRules: ChartRule[] = [
     ),
   },
   {
-    title: 'Distribution',
-    description: 'Single Numeric → Histogram with KDE overlay',
-    columns: ['Revenue'],
-    chartType: 'Histogram',
-    icon: Grid,
+    title: 'Department Performance',
+    description: 'Category + Numeric → Grouped bar chart comparing team metrics across business departments.',
+    columns: ['Department', 'Revenue'],
+    chartType: 'Grouped Bar',
+    icon: BarChart3,
     color: 'data-3',
     example: (
       <svg viewBox="0 0 200 80" className="w-full h-24" aria-hidden="true">
-        <rect x="15" y="45" width="18" height="20" fill="var(--color-data-3)" rx="1" />
-        <rect x="38" y="35" width="18" height="30" fill="var(--color-data-3)" rx="1" />
-        <rect x="61" y="25" width="18" height="40" fill="var(--color-data-3)" rx="1" />
-        <rect x="84" y="20" width="18" height="45" fill="var(--color-data-3)" rx="1" />
-        <rect x="107" y="30" width="18" height="35" fill="var(--color-data-3)" rx="1" />
-        <rect x="130" y="40" width="18" height="25" fill="var(--color-data-3)" rx="1" />
-        <rect x="153" y="50" width="18" height="15" fill="var(--color-data-3)" rx="1" />
-        <rect x="176" y="60" width="18" height="5" fill="var(--color-data-3)" rx="1" />
+        <rect x="20" y="35" width="20" height="30" fill="var(--color-data-3)" rx="1" />
+        <rect x="42" y="45" width="20" height="20" fill="var(--color-data-3)" rx="1" opacity="0.6" />
+        <rect x="75" y="30" width="20" height="35" fill="var(--color-data-3)" rx="1" />
+        <rect x="97" y="40" width="20" height="25" fill="var(--color-data-3)" rx="1" opacity="0.6" />
+        <rect x="130" y="25" width="20" height="40" fill="var(--color-data-3)" rx="1" />
+        <rect x="152" y="35" width="20" height="30" fill="var(--color-data-3)" rx="1" opacity="0.6" />
       </svg>
     ),
   },
   {
-    title: 'Relationship',
-    description: 'Numeric + Numeric → Scatter with correlation',
-    columns: ['Units', 'Revenue'],
-    chartType: 'Scatter Plot',
-    icon: Maximize,
-    color: 'data-4',
-    example: (
-      <svg viewBox="0 0 200 80" className="w-full h-24" aria-hidden="true">
-        <circle cx="30" cy="60" r="3" fill="var(--color-data-4)" />
-        <circle cx="50" cy="55" r="3" fill="var(--color-data-4)" />
-        <circle cx="70" cy="45" r="3" fill="var(--color-data-4)" />
-        <circle cx="90" cy="35" r="3" fill="var(--color-data-4)" />
-        <circle cx="110" cy="30" r="3" fill="var(--color-data-4)" />
-        <circle cx="130" cy="25" r="3" fill="var(--color-data-4)" />
-        <circle cx="150" cy="20" r="3" fill="var(--color-data-4)" />
-        <circle cx="170" cy="15" r="3" fill="var(--color-data-4)" />
-        <line x1="20" y1="70" x2="180" y2="10" stroke="var(--color-data-4)" strokeWidth="1" strokeDasharray="4,4" opacity="0.5" />
-      </svg>
-    ),
-  },
-  {
-    title: 'Proportion',
-    description: 'Category → Donut or stacked bar for parts-of-whole',
+    title: 'Product Category Distribution',
+    description: 'Category → Donut or pie chart for understanding product mix and revenue share.',
     columns: ['Product'],
     chartType: 'Donut Chart',
     icon: PieChart,
-    color: 'data-5',
+    color: 'data-4',
     example: (
       <svg viewBox="0 0 200 80" className="w-full h-24" aria-hidden="true">
-        <circle cx="100" cy="40" r="25" fill="none" stroke="var(--color-data-5)" strokeWidth="15" strokeDasharray="157" strokeDashoffset="0" />
+        <circle cx="100" cy="40" r="25" fill="none" stroke="var(--color-data-4)" strokeWidth="15" strokeDasharray="157" strokeDashoffset="0" />
         <circle cx="100" cy="40" r="25" fill="none" stroke="var(--color-data-2)" strokeWidth="15" strokeDasharray="157" strokeDashoffset="78" />
         <circle cx="100" cy="40" r="25" fill="none" stroke="var(--color-data-3)" strokeWidth="15" strokeDasharray="157" strokeDashoffset="120" />
         <circle cx="100" cy="40" r="25" fill="none" stroke="var(--color-data-1)" strokeWidth="15" strokeDasharray="157" strokeDashoffset="145" />
@@ -121,8 +98,28 @@ const chartRules: ChartRule[] = [
     ),
   },
   {
-    title: 'Key Metric',
-    description: 'Single aggregate → KPI card with sparkline',
+    title: 'Salary Distribution',
+    description: 'Single Numeric → Histogram showing salary distribution across employee population.',
+    columns: ['Salary'],
+    chartType: 'Histogram',
+    icon: Grid,
+    color: 'data-5',
+    example: (
+      <svg viewBox="0 0 200 80" className="w-full h-24" aria-hidden="true">
+        <rect x="15" y="45" width="18" height="20" fill="var(--color-data-5)" rx="1" />
+        <rect x="38" y="35" width="18" height="30" fill="var(--color-data-5)" rx="1" />
+        <rect x="61" y="25" width="18" height="40" fill="var(--color-data-5)" rx="1" />
+        <rect x="84" y="20" width="18" height="45" fill="var(--color-data-5)" rx="1" />
+        <rect x="107" y="30" width="18" height="35" fill="var(--color-data-5)" rx="1" />
+        <rect x="130" y="40" width="18" height="25" fill="var(--color-data-5)" rx="1" />
+        <rect x="153" y="50" width="18" height="15" fill="var(--color-data-5)" rx="1" />
+        <rect x="176" y="60" width="18" height="5" fill="var(--color-data-5)" rx="1" />
+      </svg>
+    ),
+  },
+  {
+    title: 'Key Business Metric',
+    description: 'Single aggregate → KPI card with sparkline for executive dashboards and reporting.',
     columns: ['Total Revenue'],
     chartType: 'KPI Card',
     icon: Layout,
@@ -138,7 +135,7 @@ const chartRules: ChartRule[] = [
 ]
 
 export function VisualizationSection() {
-  const sectionRef = useRef<HTMLSectionElement>(null)
+  const sectionRef = useRef<HTMLElement>(null)
   const isVisible = useIntersectionObserver(sectionRef)
   const prefersReduced = useReducedMotion()
 
@@ -262,12 +259,12 @@ export function VisualizationSection() {
                     </div>
                     <div className="bg-bg-2 rounded-lg border border-border-1 p-2">
                       <div className="text-center text-xs text-fg-2 h-full flex items-center justify-center">
-                        Region Bar Chart
+                        Sales by Region
                       </div>
                     </div>
                     <div className="bg-bg-2 rounded-lg border border-border-1 p-2">
                       <div className="text-center text-xs text-fg-2 h-full flex items-center justify-center">
-                        Product Donut
+                        Product Category
                       </div>
                     </div>
                     <div className="bg-accent-bg border-accent/30 border rounded-lg p-2">

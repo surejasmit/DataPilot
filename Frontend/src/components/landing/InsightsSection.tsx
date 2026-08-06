@@ -2,29 +2,48 @@ import { useRef } from 'react'
 import { motion } from 'framer-motion'
 import { useIntersectionObserver, useReducedMotion } from '@/hooks/useMedia'
 import { cn } from '@/lib/utils'
-import { Badge } from '@/components/ui'
 import { TrendingUp, Users, AlertTriangle, BarChart3, Filter, Zap } from 'lucide-react'
 
 const insights = [
   {
-    type: 'correlation',
-    title: 'Revenue strongly correlates with repeat purchases (r = 0.73)',
-    description: 'Customers with 2+ prior orders generate 2.3× more revenue per transaction. The relationship holds across all regions and product categories.',
-    metric: 'r = 0.73',
+    type: 'revenue',
+    title: 'Sales Revenue increased 23% compared to last quarter',
+    description: 'Strongest growth across all regions. Driven by enterprise segment expansion and new product launches. North America leads with $2.4M in revenue.',
+    metric: '+23%',
     icon: TrendingUp,
     color: 'data-1',
-    evidence: 'Pearson correlation · n = 12,480 · p < 0.001',
-    tags: ['Correlation', 'Revenue', 'Significant'],
+    evidence: 'Quarter-over-quarter comparison · 12,480 transactions',
+    tags: ['Revenue', 'Growth', 'Quarterly'],
   },
   {
-    type: 'trend',
-    title: 'West region revenue increased 18.4% YoY',
-    description: 'Strongest growth across all four regions. Driven by Widget C adoption (+42%) and enterprise segment expansion. East region flat at +1.2%.',
-    metric: '+18.4%',
-    icon: BarChart3,
+    type: 'attrition',
+    title: 'Employee attrition rate is highest in Engineering department',
+    description: 'Engineering department shows 18% attrition rate, 2.4x the company average. Exit interviews cite compensation and growth opportunities as primary factors.',
+    metric: '18%',
+    icon: Users,
     color: 'data-2',
-    evidence: 'Year-over-year comparison · 3,120 West region rows',
-    tags: ['Trend', 'Regional', 'Growth'],
+    evidence: 'HR analytics · 847 employees · 12-month window',
+    tags: ['HR', 'Attrition', 'Engineering'],
+  },
+  {
+    type: 'regional',
+    title: 'Top performing region: North America with $2.4M revenue',
+    description: 'North America generated $2.4M in Q4, exceeding forecast by 12%. EMEA follows at $1.8M with 8% growth. APAC shows potential at $1.2M.',
+    metric: '$2.4M',
+    icon: BarChart3,
+    color: 'data-3',
+    evidence: 'Regional revenue breakdown · Q4 2025',
+    tags: ['Regional', 'Performance', 'Q4'],
+  },
+  {
+    type: 'retention',
+    title: 'Customer retention rate improved by 8% after campaign',
+    description: 'Post-campaign retention increased from 72% to 80%. Repeat customers now generate 2.3x more revenue per transaction than new customers.',
+    metric: '+8%',
+    icon: Zap,
+    color: 'data-4',
+    evidence: 'Cohort analysis · 6-month window · 2,840 customers',
+    tags: ['Retention', 'Campaign', 'Customers'],
   },
   {
     type: 'anomaly',
@@ -34,34 +53,14 @@ const insights = [
     icon: AlertTriangle,
     color: 'warning',
     evidence: 'Isolation Forest (contamination=0.01) · 30-day window',
-    tags: ['Anomaly', 'Seasonal', 'Supply Chain'],
-  },
-  {
-    type: 'distribution',
-    title: 'Revenue distribution is bimodal — two distinct segments',
-    description: "Hartigan's dip test confirms two modes: enterprise (mean $4,200) and SMB (mean $890). Suggests different sales motions or pricing tiers.",
-    metric: '2 modes',
-    icon: Filter,
-    color: 'data-3',
-    evidence: "Hartigan's dip test p < 0.001 · Gaussian mixture fit",
-    tags: ['Distribution', 'Segmentation', 'Product'],
-  },
-  {
-    type: 'performance',
-    title: 'Rep "A. Chen" outperforms team by 31%',
-    description: 'Mean revenue per deal: $1,620 vs team $1,235. Effect persists after controlling for region and product. Top 3 deals closed in Q4.',
-    metric: '+31%',
-    icon: Zap,
-    color: 'data-4',
-    evidence: 'ANCOVA · 342 deals · Covariates: region, product',
-    tags: ['Performance', 'Personnel', 'Significant'],
+    tags: ['Anomaly', 'Supply Chain', 'Recovery'],
   },
   {
     type: 'segment',
     title: 'Widget C has 94% repeat purchase rate',
     description: 'Highest retention across all products. Buyers return within 45 days median. Widget A: 67%, Widget B: 52%. Cross-sell opportunity identified.',
     metric: '94%',
-    icon: Users,
+    icon: Filter,
     color: 'data-5',
     evidence: 'Cohort analysis · 6-month window · 2,840 Widget C buyers',
     tags: ['Retention', 'Product', 'Cross-sell'],
@@ -69,7 +68,7 @@ const insights = [
 ]
 
 export function InsightsSection() {
-  const sectionRef = useRef<HTMLSectionElement>(null)
+  const sectionRef = useRef<HTMLElement>(null)
   const isVisible = useIntersectionObserver(sectionRef)
   const prefersReduced = useReducedMotion()
 
@@ -90,7 +89,7 @@ export function InsightsSection() {
             Automatic Discovery
           </span>
           <h2 id="insights-heading" className="text-3xl md:text-4xl lg:text-5xl font-light text-fg-0 tracking-tight">
-            Patterns you didn't know to look for
+            Business insights you didn't know to look for
           </h2>
           <p className="mt-4 text-lg text-fg-1 max-w-2xl mx-auto">
             Statistical engine runs correlation matrices, trend decompositions, segment comparisons,

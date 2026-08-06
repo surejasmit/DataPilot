@@ -1,4 +1,6 @@
 const datasetService = require('../services/dataset/index.service');
+const pythonAnalysis = require('../services/pythonAnalysis.service');
+const logger = require('../utils/logger');
 
 const uploadDataset = async (req, res) => {
   try {
@@ -15,11 +17,29 @@ const uploadDataset = async (req, res) => {
     if (isNaN(parsedProjectId)) {
     }
 
+    let validation;
+    try {
+      validation = await pythonAnalysis.validateDataset(req.file.path, req.file.originalname);
+    } catch (e) {
+      validation = { is_business: true, domain: 'general' };
+    }
+
+    if (validation && !validation.is_business) {
+      const fs = require('fs');
+      try { fs.unlinkSync(req.file.path); } catch (e) {}
+      return res.status(400).json({
+        error: 'Not a business dataset',
+        message: validation.message || 'This platform currently supports only business datasets. Please upload datasets related to sales, HR, customers, finance, inventory, retail, marketing, manufacturing, logistics, or other business domains.',
+        domain: validation.domain || null
+      });
+    }
+
     const result = await datasetService.uploadDataset(
       req.file.path,
       req.file.originalname,
       parsedProjectId,
-      req.user.id
+      req.user.id,
+      validation
     );
 
     res.json({ success: true, dataset: result, message: result.message });
@@ -212,13 +232,29 @@ const askQuestion = async (req, res) => {
 
     const fileInfo = await datasetService.getDatasetFilePath(req.params.id);
     if (!fileInfo || !fileInfo.dataset_path) {
-      return res.status(404).json({ error: 'Dataset file not found' });
+      return res.status(400).json({ error: 'Dataset file is not available on the server. Please select a valid dataset with an uploaded file.' });
     }
 
     const result = await datasetService.askQuestion(fileInfo.dataset_path, fileInfo.dataset_name, question, req.params.id, req.user.id);
     res.json(result);
   } catch (err) {
-    res.status(500).json({ error: 'Failed to answer question', details: err.message });
+    logger.error('Error in askQuestion controller', { error: err.message, stack: err.stack });
+    res.status(500).json({ error: err.message || 'Failed to answer question', details: err.message });
+  }
+};
+
+const getSuggestedQuestions = async (req, res) => {
+  try {
+    const fileInfo = await datasetService.getDatasetFilePath(req.params.id);
+    if (!fileInfo || !fileInfo.dataset_path) {
+      return res.json([]);
+    }
+    const pythonService = require('../services/pythonAnalysis.service');
+    const result = await pythonService.suggestQuestions(fileInfo.dataset_path, fileInfo.dataset_name);
+    res.json(result.questions || []);
+  } catch (err) {
+    logger.error('Error in getSuggestedQuestions', { error: err.message });
+    res.json([]);
   }
 };
 
@@ -237,5 +273,6 @@ module.exports = {
   confirmCleaning,
   getInsightsForDataset,
   generateInsightsNow,
-  askQuestion
+  askQuestion,
+  getSuggestedQuestions
 };

@@ -5,17 +5,17 @@ import { Button } from '@/components/ui'
 import { Badge } from '@/components/ui/Badge'
 import { ScrollArea } from '@/components/ui/ScrollArea'
 import {
-  Send, Loader2, MessageSquare, Sparkles, Copy, ArrowUpRight,
-  Paperclip, Menu, X, Database, Plus,
+  Send, Loader2, Sparkles, Copy, ArrowUpRight,
+  Menu, X, Database,
 } from 'lucide-react'
 import { Avatar } from '@/components/ui/Avatar'
+import { api, Project } from '@/lib/api'
 
 interface Message {
   id: string
   role: 'user' | 'assistant'
   content: string
   timestamp: Date
-  isStreaming?: boolean
   suggestedActions?: SuggestedAction[]
 }
 
@@ -24,75 +24,47 @@ interface SuggestedAction {
   action: string
 }
 
-const mockChats = [
-  { id: '1', title: 'Q1 Revenue Analysis', time: '2h ago', active: true },
-  { id: '2', title: 'Customer Churn Patterns', time: '1d ago', active: false },
-  { id: '3', title: 'Product Performance', time: '3d ago', active: false },
-  { id: '4', title: 'Regional Comparison', time: '1w ago', active: false },
-]
-
-const mockMessages: Message[] = [
-  {
-    id: '1',
-    role: 'assistant',
-    content: `Hello! I'm your AI data analyst. I can help you explore your datasets, generate insights, create visualizations, and answer questions about your data.
-
-What would you like to do today?`,
-    timestamp: new Date(Date.now() - 1000 * 60 * 5),
-    suggestedActions: [
-      { label: 'Analyze my latest dataset', action: 'analyze' },
-      { label: 'Show me data quality issues', action: 'quality' },
-      { label: 'Generate a summary report', action: 'report' },
-    ],
-  },
-  {
-    id: '2',
-    role: 'user',
-    content: 'Which region had the highest revenue growth last quarter?',
-    timestamp: new Date(Date.now() - 1000 * 60 * 3),
-  },
-  {
-    id: '3',
-    role: 'assistant',
-    content: `Based on your **Sales Analysis Q1 2026** dataset (12,480 rows), the **West region** had the highest revenue growth at **+18.4%** compared to the prior quarter.
-
-**Key findings:**
-- West: +18.4% ($2.3M → $2.7M)
-- Northeast: +12.1% ($1.8M → $2.0M)
-- South: +5.2% ($1.5M → $1.6M)
-- Midwest: -2.3% ($1.9M → $1.8M)
-
-The growth in the West region is statistically significant (p < 0.01) and driven primarily by the **Enterprise** segment, which grew 34% YoY.
-
-Would you like me to create a visualization of this trend or drill down into the top-performing products in the West region?`,
-    timestamp: new Date(Date.now() - 1000 * 60 * 2),
-    suggestedActions: [
-      { label: 'Create revenue trend chart', action: 'chart' },
-      { label: 'Show top products in West', action: 'products' },
-      { label: 'Compare all regions', action: 'compare' },
-    ],
-  },
-]
-
-const suggestedPrompts = [
-  'Which product has the highest sales?',
-  'Find missing values in my dataset',
-  'Show correlation matrix',
-  'Predict customer churn',
-  'What are the top 5 customers by revenue?',
-  'Show me outliers in the data',
-  'Create a dashboard summary',
-  'Explain the data distribution',
-]
-
 export function AskAIPage() {
-  const [messages, setMessages] = useState<Message[]>(mockMessages)
+  const [messages, setMessages] = useState<Message[]>([
+    {
+      id: '1',
+      role: 'assistant',
+      content: "Hello! I'm your AI data analyst. Select a dataset from the sidebar, then ask me anything about your data.",
+      timestamp: new Date(),
+    },
+  ])
   const [input, setInput] = useState('')
   const [isLoading, setIsLoading] = useState(false)
   const [showSuggestions, setShowSuggestions] = useState(true)
   const [showChatHistory, setShowChatHistory] = useState(false)
+  const [selectedDataset, setSelectedDataset] = useState<Project | null>(null)
+  const [projects, setProjects] = useState<Project[]>([])
+  const [suggestedQuestions, setSuggestedQuestions] = useState<string[]>([])
   const messagesEndRef = useRef<HTMLDivElement>(null)
   const inputRef = useRef<HTMLTextAreaElement>(null)
+
+  useEffect(() => {
+    api.projects.getAll()
+      .then(projs => {
+        const withDataset = projs.filter(p => p.dataset_name)
+        const readyProjects = withDataset.filter(p => p.dataset_path && (p.status === 'READY' || p.status === 'completed'))
+        const listToShow = readyProjects.length > 0 ? readyProjects : withDataset
+        setProjects(listToShow)
+        if (listToShow.length > 0 && !selectedDataset) {
+          const defaultProject = listToShow.find(p => p.dataset_path) || listToShow[0]
+          setSelectedDataset(defaultProject)
+        }
+      })
+      .catch(() => {})
+  }, [])
+
+  useEffect(() => {
+    if (selectedDataset) {
+      api.datasets.getSuggestedQuestions(String(selectedDataset.id))
+        .then(qs => setSuggestedQuestions(Array.isArray(qs) ? qs : []))
+        .catch(() => setSuggestedQuestions([]))
+    }
+  }, [selectedDataset])
 
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' })
@@ -101,6 +73,16 @@ export function AskAIPage() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     if (!input.trim() || isLoading) return
+    if (!selectedDataset) {
+      const msg: Message = {
+        id: `${Date.now()}-err`,
+        role: 'assistant',
+        content: 'Please select a dataset first from the sidebar before asking questions.',
+        timestamp: new Date(),
+      }
+      setMessages(prev => [...prev, msg])
+      return
+    }
 
     const userMessage: Message = {
       id: `${Date.now()}`,
@@ -115,27 +97,38 @@ export function AskAIPage() {
     setShowSuggestions(false)
     setIsLoading(true)
 
-    await new Promise(resolve => setTimeout(resolve, 1500))
+    try {
+      const response = await api.datasets.askQuestion(String(selectedDataset.id), userInput)
+      const answer = typeof response === 'string'
+        ? response
+        : response?.answer || response?.message || response?.response || JSON.stringify(response)
 
-    const aiMessage: Message = {
-      id: `${Date.now()}-ai`,
-      role: 'assistant',
-      content: `I analyzed your question about "${userInput}". Based on the current dataset, here are the key findings...`,
-      timestamp: new Date(),
-      suggestedActions: [
-        { label: 'Create visualization', action: 'viz' },
-        { label: 'Export results', action: 'export' },
-        { label: 'Ask follow-up', action: 'followup' },
-      ],
+      const aiMessage: Message = {
+        id: `${Date.now()}-ai`,
+        role: 'assistant',
+        content: answer,
+        timestamp: new Date(),
+      }
+      setMessages(prev => [...prev, aiMessage])
+    } catch (err) {
+      const errMessage: Message = {
+        id: `${Date.now()}-err`,
+        role: 'assistant',
+        content: `Sorry, I encountered an error: ${err instanceof Error ? err.message : 'Unknown error'}. Please try again.`,
+        timestamp: new Date(),
+      }
+      setMessages(prev => [...prev, errMessage])
+    } finally {
+      setIsLoading(false)
     }
-
-    setMessages(prev => [...prev, aiMessage])
-    setIsLoading(false)
   }
 
   const handleSuggestionClick = (prompt: string) => {
     setInput(prompt)
-    handleSubmit(new Event('submit') as any)
+    setTimeout(() => {
+      const form = document.querySelector('form')
+      if (form) form.requestSubmit()
+    }, 0)
   }
 
   const handleKeyDown = (e: React.KeyboardEvent) => {
@@ -149,39 +142,60 @@ export function AskAIPage() {
     navigator.clipboard.writeText(text)
   }
 
+  const promptsToShow = suggestedQuestions.length > 0 ? suggestedQuestions : [
+    'Which product has the highest sales?',
+    'Find missing values in my dataset',
+    'Show correlation matrix',
+    'What are the top 5 rows by revenue?',
+  ]
+
   return (
     <div className="flex h-[calc(100vh-160px)] min-h-[600px] animate-fade-in -m-4 lg:-m-6 xl:-m-8">
+      {/* Sidebar - Dataset Selection */}
       <aside className={cn(
         'w-64 flex-shrink-0 border-r border-border-1 bg-bg-1 flex flex-col transition-all duration-300',
         'hidden lg:flex'
       )}>
         <div className="p-3 border-b border-border-1">
-          <Button className="w-full justify-start gap-2" variant="outline" size="sm" onClick={() => {}}>
-            <Plus className="w-4 h-4" />
-            New Chat
-          </Button>
+          <h3 className="text-xs font-semibold text-fg-3 uppercase tracking-wider mb-2">Datasets</h3>
         </div>
         <div className="flex-1 overflow-y-auto p-2 space-y-0.5">
-          {mockChats.map(chat => (
+          {projects.length === 0 && (
+            <p className="text-xs text-fg-3 p-3">No datasets available. Upload a dataset first.</p>
+          )}
+          {projects.map(project => (
             <button
-              key={chat.id}
+              key={project.id}
+              onClick={() => {
+                setSelectedDataset(project)
+                setMessages([{
+                  id: 'welcome',
+                  role: 'assistant',
+                  content: `Switched to dataset "${project.dataset_name || project.name}". Ask me anything about this data!`,
+                  timestamp: new Date(),
+                }])
+                setShowSuggestions(true)
+              }}
               className={cn(
                 'w-full text-left px-3 py-2.5 rounded-lg text-sm transition-colors',
-                chat.active
+                selectedDataset?.id === project.id
                   ? 'bg-accent-bg text-accent border border-accent/20'
                   : 'text-fg-1 hover:bg-bg-2 hover:text-fg-0'
               )}
             >
               <div className="flex items-center gap-2">
-                <MessageSquare className="w-4 h-4 flex-shrink-0" />
-                <span className="truncate">{chat.title}</span>
+                <Database className="w-4 h-4 flex-shrink-0" />
+                <span className="truncate">{project.dataset_name || project.name}</span>
               </div>
-              <p className="text-[11px] text-fg-3 mt-0.5 ml-6">{chat.time}</p>
+              {project.dataset_rows && (
+                <p className="text-[11px] text-fg-3 mt-0.5 ml-6">{project.dataset_rows.toLocaleString()} rows</p>
+              )}
             </button>
           ))}
         </div>
       </aside>
 
+      {/* Main Chat Area */}
       <div className="flex-1 flex flex-col min-w-0">
         <header className="flex items-center justify-between px-4 py-3 border-b border-border-1 bg-bg-0/50">
           <div className="flex items-center gap-3">
@@ -196,20 +210,35 @@ export function AskAIPage() {
                 <Sparkles className="w-4 h-4 text-accent" />
                 AI Chat
               </h1>
-              <p className="text-[11px] text-fg-3">Ask anything about your data</p>
+              <p className="text-[11px] text-fg-3">
+                {selectedDataset ? `Asking about: ${selectedDataset.dataset_name || selectedDataset.name}` : 'Select a dataset to start'}
+              </p>
             </div>
           </div>
           <div className="flex items-center gap-2">
-            <Badge variant="accent" size="sm" className="gap-1.5 hidden sm:flex">
-              <Database className="w-3 h-3" />
-              Sales Analysis Q1 2026
-            </Badge>
+            {selectedDataset && (
+              <Badge variant="accent" size="sm" className="gap-1.5 hidden sm:flex">
+                <Database className="w-3 h-3" />
+                {selectedDataset.dataset_name || selectedDataset.name}
+              </Badge>
+            )}
           </div>
         </header>
 
         <div className="flex-1 overflow-hidden flex flex-col">
           <ScrollArea className="flex-1 px-4 py-6">
             <div className="max-w-3xl mx-auto space-y-6">
+              {!selectedDataset && (
+                <div className="p-6 text-center">
+                  <Database className="w-12 h-12 text-fg-3 mx-auto mb-3" />
+                  <h3 className="text-lg font-medium text-fg-0 mb-2">No Dataset Selected</h3>
+                  <p className="text-sm text-fg-2 mb-4">Select a dataset from the sidebar to start asking questions about your data.</p>
+                  {projects.length === 0 && (
+                    <p className="text-xs text-fg-3">No projects with datasets found. Upload a dataset first.</p>
+                  )}
+                </div>
+              )}
+
               <AnimatePresence mode="popLayout">
                 {messages.map((message, index) => (
                   <motion.div
@@ -251,7 +280,7 @@ export function AskAIPage() {
                               variant="ghost"
                               size="sm"
                               className="gap-1.5 text-xs"
-                              onClick={() => handleSuggestionClick(action.action)}
+                              onClick={() => handleSuggestionClick(action.label)}
                             >
                               <ArrowUpRight className="w-3 h-3" />
                               {action.label}
@@ -312,7 +341,7 @@ export function AskAIPage() {
               <div className="max-w-3xl mx-auto">
                 <p className="text-xs text-fg-3 mb-2.5 font-medium">Try asking</p>
                 <div className="grid grid-cols-2 gap-2">
-                  {suggestedPrompts.slice(0, 4).map((prompt, i) => (
+                  {promptsToShow.slice(0, 4).map((prompt, i) => (
                     <button
                       key={i}
                       className="text-left p-3 bg-bg-1 border border-border-1 rounded-xl text-sm text-fg-1 hover:text-fg-0 hover:border-accent/40 hover:bg-accent-bg/10 transition-all"
@@ -334,30 +363,23 @@ export function AskAIPage() {
                   value={input}
                   onChange={e => setInput(e.target.value)}
                   onKeyDown={handleKeyDown}
-                  placeholder="Ask any question about your dataset..."
+                  placeholder={selectedDataset ? "Ask any question about your dataset..." : "Select a dataset first..."}
+                  disabled={!selectedDataset}
                   className={cn(
                     'w-full px-4 py-3 pr-24 bg-bg-1 border border-border-1 text-fg-0 placeholder-fg-3',
                     'rounded-xl resize-none transition-colors',
                     'focus:outline-none focus:ring-2 focus:ring-accent focus:border-transparent',
-                    'min-h-[48px] max-h-[150px]'
+                    'min-h-[48px] max-h-[150px]',
+                    !selectedDataset && 'opacity-50 cursor-not-allowed'
                   )}
                   rows={1}
                   style={{ height: 'auto' }}
                 />
                 <div className="absolute right-2 bottom-2 flex items-center gap-1">
                   <Button
-                    type="button"
-                    variant="ghost"
-                    size="sm"
-                    className="h-8 w-8 p-0 text-fg-3 hover:text-fg-0"
-                    aria-label="Attach file"
-                  >
-                    <Paperclip className="w-4 h-4" />
-                  </Button>
-                  <Button
                     type="submit"
                     size="sm"
-                    disabled={!input.trim() || isLoading}
+                    disabled={!input.trim() || isLoading || !selectedDataset}
                     className="h-8 w-8 p-0 rounded-lg"
                     aria-label="Send message"
                   >
@@ -377,75 +399,79 @@ export function AskAIPage() {
         </div>
       </div>
 
+      {/* Right sidebar - Dataset Info */}
       <aside className="w-64 flex-shrink-0 border-l border-border-1 bg-bg-1 hidden xl:flex flex-col">
         <div className="p-3 border-b border-border-1">
           <h3 className="text-xs font-semibold text-fg-3 uppercase tracking-wider">Dataset Info</h3>
         </div>
         <div className="p-3 space-y-3">
-          <div className="p-3 bg-bg-2 rounded-lg">
-            <p className="text-xs text-fg-3 mb-1">Active Dataset</p>
-            <p className="text-sm font-medium text-fg-0">Sales Analysis Q1 2026</p>
-            <div className="flex items-center gap-3 mt-2 text-xs text-fg-3">
-              <span>12,480 rows</span>
-              <span>·</span>
-              <span>24 columns</span>
+          {selectedDataset ? (
+            <>
+              <div className="p-3 bg-bg-2 rounded-lg">
+                <p className="text-xs text-fg-3 mb-1">Active Dataset</p>
+                <p className="text-sm font-medium text-fg-0">{selectedDataset.dataset_name || selectedDataset.name}</p>
+                <div className="flex items-center gap-3 mt-2 text-xs text-fg-3">
+                  {selectedDataset.dataset_rows && <span>{selectedDataset.dataset_rows.toLocaleString()} rows</span>}
+                  {selectedDataset.dataset_columns && (
+                    <>
+                      <span>·</span>
+                      <span>{selectedDataset.dataset_columns} columns</span>
+                    </>
+                  )}
+                </div>
+              </div>
+              {selectedDataset.dataset_size && (
+                <div className="p-3 bg-bg-2 rounded-lg">
+                  <p className="text-xs text-fg-3 mb-1">File Size</p>
+                  <p className="text-sm font-medium text-fg-0">{(selectedDataset.dataset_size / 1024 / 1024).toFixed(2)} MB</p>
+                </div>
+              )}
+            </>
+          ) : (
+            <div className="p-3 bg-bg-2 rounded-lg text-center">
+              <Database className="w-8 h-8 text-fg-3 mx-auto mb-2" />
+              <p className="text-sm text-fg-2">No dataset selected</p>
             </div>
-          </div>
-          <div className="p-3 bg-bg-2 rounded-lg">
-            <p className="text-xs text-fg-3 mb-1">Data Quality</p>
-            <div className="flex items-center gap-2">
-              <div className="flex-1 h-1.5 bg-bg-3 rounded-full overflow-hidden">
-                <div className="h-full bg-success rounded-full" style={{ width: '94%' }} />
-              </div>
-              <span className="text-xs font-medium text-success">94%</span>
-            </div>
-          </div>
-          <div className="p-3 bg-bg-2 rounded-lg">
-            <p className="text-xs text-fg-3 mb-1">Quick Stats</p>
-            <div className="space-y-1.5 mt-2">
-              <div className="flex justify-between text-xs">
-                <span className="text-fg-2">Numeric columns</span>
-                <span className="font-mono text-fg-0">8</span>
-              </div>
-              <div className="flex justify-between text-xs">
-                <span className="text-fg-2">Categorical columns</span>
-                <span className="font-mono text-fg-0">14</span>
-              </div>
-              <div className="flex justify-between text-xs">
-                <span className="text-fg-2">Date columns</span>
-                <span className="font-mono text-fg-0">2</span>
-              </div>
-            </div>
-          </div>
+          )}
         </div>
       </aside>
 
+      {/* Mobile Chat History Overlay */}
       {showChatHistory && (
         <div className="fixed inset-0 z-50 lg:hidden">
           <div className="absolute inset-0 bg-black/50" onClick={() => setShowChatHistory(false)} />
           <aside className="absolute left-0 top-0 bottom-0 w-72 bg-bg-1 border-r border-border-1 flex flex-col">
             <div className="flex items-center justify-between p-3 border-b border-border-1">
-              <h3 className="font-medium text-fg-0 text-sm">Chat History</h3>
+              <h3 className="font-medium text-fg-0 text-sm">Datasets</h3>
               <button onClick={() => setShowChatHistory(false)} className="p-1 text-fg-2 hover:text-fg-0">
                 <X className="w-4 h-4" />
               </button>
             </div>
             <div className="flex-1 overflow-y-auto p-2 space-y-0.5">
-              {mockChats.map(chat => (
+              {projects.map(project => (
                 <button
-                  key={chat.id}
+                  key={project.id}
+                  onClick={() => {
+                    setSelectedDataset(project)
+                    setShowChatHistory(false)
+                    setMessages([{
+                      id: 'welcome',
+                      role: 'assistant',
+                      content: `Switched to dataset "${project.dataset_name || project.name}". Ask me anything!`,
+                      timestamp: new Date(),
+                    }])
+                  }}
                   className={cn(
                     'w-full text-left px-3 py-2.5 rounded-lg text-sm transition-colors',
-                    chat.active
+                    selectedDataset?.id === project.id
                       ? 'bg-accent-bg text-accent border border-accent/20'
                       : 'text-fg-1 hover:bg-bg-2 hover:text-fg-0'
                   )}
                 >
                   <div className="flex items-center gap-2">
-                    <MessageSquare className="w-4 h-4 flex-shrink-0" />
-                    <span className="truncate">{chat.title}</span>
+                    <Database className="w-4 h-4 flex-shrink-0" />
+                    <span className="truncate">{project.dataset_name || project.name}</span>
                   </div>
-                  <p className="text-[11px] text-fg-3 mt-0.5 ml-6">{chat.time}</p>
                 </button>
               ))}
             </div>

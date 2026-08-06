@@ -1,4 +1,4 @@
-import { Routes, Route, Navigate } from 'react-router-dom'
+import { Routes, Route } from 'react-router-dom'
 import { LandingPage } from './pages/LandingPage'
 import { SignUpPage } from './pages/SignUpPage'
 import { SignInPage } from './pages/SignInPage'
@@ -14,6 +14,7 @@ import { SettingsPage } from './pages/SettingsPage'
 import { AnalyticsPage } from './pages/AnalyticsPage'
 import { NotFoundPage } from './pages/NotFoundPage'
 import { AppLayout } from './components/app/AppLayout'
+import ProtectedRoute from './components/auth/ProtectedRoute'
 
 function App() {
   return (
@@ -23,19 +24,20 @@ function App() {
       <Route path="/signin" element={<SignInPage />} />
 
       {/* Authenticated routes with AppLayout */}
-      <Route element={<AppLayout />}>
-        <Route path="/dashboard" element={<DashboardPage />} />
-        <Route path="/projects" element={<ProjectsPage />} />
-        <Route path="/projects/new" element={<CreateProjectPage />} />
-        <Route path="/projects/:id" element={<DatasetDashboardPage />} />
-        <Route path="/projects/:id/insights" element={<DatasetInsightsPage />} />
-        <Route path="/ask-ai" element={<AskAIPage />} />
-        <Route path="/insights" element={<InsightsPage />} />
-        <Route path="/analytics" element={<AnalyticsPage />} />
-        {/* <Route path="/analysis" element={<AnalyticsPage />} /> */}
-        <Route path="/analysis/:id" element={<DatasetDashboardPage />} />
-        <Route path="/profile" element={<ProfilePage />} />
-        <Route path="/settings" element={<SettingsPage />} />
+      <Route element={<ProtectedRoute />}>
+        <Route element={<AppLayout />}>
+          <Route path="/dashboard" element={<DashboardPage />} />
+          <Route path="/projects" element={<ProjectsPage />} />
+          <Route path="/projects/new" element={<CreateProjectPage />} />
+          <Route path="/projects/:id" element={<DatasetDashboardPage />} />
+          <Route path="/projects/:id/insights" element={<DatasetInsightsPage />} />
+          <Route path="/ask-ai" element={<AskAIPage />} />
+          <Route path="/insights" element={<InsightsPage />} />
+          <Route path="/analytics" element={<AnalyticsPage />} />
+          <Route path="/analysis/:id" element={<DatasetDashboardPage />} />
+          <Route path="/profile" element={<ProfilePage />} />
+          <Route path="/settings" element={<SettingsPage />} />
+        </Route>
       </Route>
 
       <Route path="*" element={<NotFoundPage />} />

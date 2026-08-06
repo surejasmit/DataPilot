@@ -1,6 +1,6 @@
 import React, { createContext, useContext, useState, useRef, useEffect, type ReactNode, forwardRef } from 'react'
 import { cn } from '@/lib/utils'
-import { X, ChevronDown } from 'lucide-react'
+import { ChevronDown } from 'lucide-react'
 
 interface DropdownMenuContextType {
   isOpen: boolean
@@ -77,11 +77,12 @@ export const DropdownMenuTrigger = forwardRef<HTMLButtonElement, DropdownMenuTri
     }
 
     if (asChild && React.isValidElement(children)) {
+      const childProps = (children as React.ReactElement<Record<string, unknown>>).props as Record<string, unknown>
       return React.cloneElement(children as React.ReactElement<Record<string, unknown>>, {
         ref: handleRef,
         onClick: (e: React.MouseEvent) => {
           setIsOpen(!isOpen);
-          (children as React.ReactElement<Record<string, unknown>>).props.onClick?.(e)
+          if (typeof childProps.onClick === 'function') childProps.onClick(e)
         },
         'aria-expanded': isOpen,
         'aria-haspopup': 'menu' as const,
@@ -111,13 +112,13 @@ DropdownMenuTrigger.displayName = 'DropdownMenuTrigger'
 
 interface DropdownMenuContentProps extends React.HTMLAttributes<HTMLDivElement> {
   children: ReactNode
-  align?: 'left' | 'right'
+  align?: 'left' | 'right' | 'end'
   sideOffset?: number
 }
 
 export const DropdownMenuContent = forwardRef<HTMLDivElement, DropdownMenuContentProps>(
   ({ className, children, align = 'right', sideOffset = 8, ...props }, ref) => {
-    const { isOpen, setIsOpen, contentRef } = useDropdownMenu()
+    const { isOpen, contentRef } = useDropdownMenu()
 
     if (!isOpen) return null
 
@@ -130,7 +131,7 @@ export const DropdownMenuContent = forwardRef<HTMLDivElement, DropdownMenuConten
         }}
         className={cn(
           'fixed z-50 min-w-[180px] bg-bg-1 border border-border-1 rounded-xl shadow-lg p-1 animate-scale-in',
-          align === 'right' ? 'right-0' : 'left-0',
+          (align === 'right' || align === 'end') ? 'right-0' : 'left-0',
           className
         )}
         role="menu"
@@ -158,12 +159,13 @@ export const DropdownMenuItem = forwardRef<HTMLButtonElement, DropdownMenuItemPr
     const { setIsOpen } = useDropdownMenu()
 
     if (asChild && React.isValidElement(children)) {
+      const childProps = (children as React.ReactElement<Record<string, unknown>>).props as Record<string, unknown>
       return React.cloneElement(children as React.ReactElement<Record<string, unknown>>, {
         ref,
         role: 'menuitem',
         onClick: (e: React.MouseEvent) => {
           onClick?.(e as React.MouseEvent<HTMLButtonElement>);
-          (children as React.ReactElement<Record<string, unknown>>).props.onClick?.(e)
+          if (typeof childProps.onClick === 'function') childProps.onClick(e)
           setIsOpen(false)
         },
       })

@@ -48,21 +48,6 @@ export function Navbar() {
             className="flex items-center gap-4 font-semibold text-xl text-fg-0 tracking-tight"
             aria-label="DataPilot AI Home"
           >
-            {/* <svg
-              className="w-7 h-7 text-accent"
-              viewBox="0 0 32 32"
-              fill="none"
-              aria-hidden="true"
-            >
-              <rect width="32" height="32" rx="6" fill="currentColor" />
-              <path
-                d="M8 10h16M8 16h12M8 22h8"
-                stroke="#0a0b0d"
-                strokeWidth="2.5"
-                strokeLinecap="round"
-              />
-            </svg> */}
-            {/* <span>DataPilot AI</span> */}
             <img
               src={logo}
               alt="DataPilot AI Logo"
@@ -70,12 +55,10 @@ export function Navbar() {
             />
           </Link>
 
-          <div
-            className={cn(
-              'hidden lg:flex items-center gap-8',
-              isMobileOpen && 'lg:hidden fixed inset-0 bg-bg-0/98 backdrop-blur-md z-40 flex flex-col items-start justify-start p-8 gap-6'
-            )}
-          >
+          <div className="hidden lg:flex items-center gap-8">
+            <div className="flex items-center gap-2 text-xs text-fg-3 border-l border-border-1 pl-4">
+              <span className="font-medium text-fg-2">Business Analytics Platform</span>
+            </div>
             <div className="flex items-center gap-6">
               {navItems.map((item) => (
                 <UILink
@@ -93,7 +76,6 @@ export function Navbar() {
               <>
                 <UILink
                   to="/signin"
-                  onClick={() => setIsMobileOpen(false)}
                   className="text-sm font-medium text-fg-1 hover:text-fg-0 transition-colors lg:hidden"
                 >
                   Sign In

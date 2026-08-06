@@ -14,6 +14,7 @@ class FileType(str, Enum):
     CSV = "csv"
     EXCEL = "excel"
     JSON = "json"
+    PARQUET = "parquet"
 
 
 class ColumnProfile(BaseModel):
@@ -135,6 +136,9 @@ class AnalysisResponse(BaseModel):
     quality_report: QualityReport
     preview_rows: List[Dict[str, Any]] = []
     processing_time_ms: int
+    domain: Optional[str] = None
+    is_business: Optional[bool] = None
+    business_confidence: Optional[float] = None
 
 
 class CleaningRequest(BaseModel):
@@ -175,6 +179,14 @@ class QuestionResponse(BaseModel):
     confidence: float
     details: Dict[str, Any] = {}
     sources: List[str] = []
+
+
+class BusinessValidationResponse(BaseModel):
+    is_business: bool
+    domain: str
+    confidence: float
+    detected_columns: List[str] = []
+    message: str
 
 
 class HealthResponse(BaseModel):

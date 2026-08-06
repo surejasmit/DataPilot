@@ -1,17 +1,15 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { cn } from '@/lib/utils'
 import { Button } from '@/components/ui'
-import { Card, CardHeader, CardTitle, CardDescription, CardContent, CardFooter } from '@/components/ui/Card'
+import { Card, CardHeader, CardTitle, CardDescription, CardContent } from '@/components/ui/Card'
 import { Badge } from '@/components/ui/Badge'
-import { Separator } from '@/components/ui/Separator'
 import { Input } from '@/components/ui/Input'
-import { Textarea } from '@/components/ui/Textarea'
 import { Label } from '@/components/ui/Label'
 import { Avatar } from '@/components/ui/Avatar'
+import { api } from '@/lib/api'
 import {
   User,
-  Mail,
   Calendar,
   FolderKanban,
   FileSpreadsheet,
@@ -20,62 +18,88 @@ import {
   BarChart3,
   Settings,
   Edit,
-  Camera,
   X,
-  Check,
   Save,
   TrendingUp,
   Award,
-  Star,
   Shield,
   Clock,
-  MapPin,
   Search,
   Plus,
   CheckCircle,
+  Loader2,
 } from 'lucide-react'
-
-const mockUser = {
-  name: 'smit sureja',
-  email: 'smitsureja472007@gmail.com',
-  role: 'Data Analyst',
-  memberSince: 'January 2024',
-  avatar: null,
-  location: 'morbi , gujarat',
-  bio: 'Passionate about turning raw data into actionable insights. Love exploring patterns and building predictive models.',
-  stats: {
-    projects: 12,
-    datasets: 47,
-    questions: 234,
-    insights: 1287,
-  },
-  recentActivity: [
-    { id: '1', type: 'project', title: 'Created "Sales Analysis Q1 2026"', time: '2 hours ago', icon: FolderKanban, color: 'text-data-2' },
-    { id: '2', type: 'dataset', title: 'Uploaded sales_2026.csv', time: '3 hours ago', icon: FileSpreadsheet, color: 'text-data-1' },
-    { id: '3', type: 'insight', title: 'Generated insight: West region growth', time: '5 hours ago', icon: Lightbulb, color: 'text-data-3' },
-    { id: '4', type: 'ai', title: 'Asked: "Which product has highest margin?"', time: '1 day ago', icon: MessageSquare, color: 'text-data-4' },
-    { id: '5', type: 'project', title: 'Completed "Customer Churn Prediction"', time: '3 days ago', icon: FolderKanban, color: 'text-data-2' },
-    { id: '5', type: 'viz', title: 'Created dashboard: Q1 Revenue Overview', time: '1 week ago', icon: BarChart3, color: 'text-accent' },
-  ],
-  achievements: [
-    { id: '1', name: 'Data Explorer', description: 'Analyzed 10+ datasets', icon: Search, earned: true },
-    { id: '2', name: 'Insight Generator', description: 'Generated 100+ AI insights', icon: Lightbulb, earned: true },
-    { id: '3', name: 'Quality Champion', description: 'Fixed 50+ data quality issues', icon: Shield, earned: true },
-    { id: '4', name: 'Visualization Pro', description: 'Created 20+ dashboards', icon: BarChart3, earned: false },
-    { id: '5', name: 'AI Conversationalist', description: 'Asked 200+ questions to AI', icon: MessageSquare, earned: false },
-    { id: '6', name: 'Project Master', description: 'Completed 15 projects', icon: Award, earned: false },
-  ],
-}
 
 export function ProfilePage() {
   const [activeTab, setActiveTab] = useState<'overview' | 'activity' | 'achievements' | 'edit'>('overview')
   const [isEditing, setIsEditing] = useState(false)
-  const [editForm, setEditForm] = useState({
-    name: mockUser.name,
-    email: mockUser.email,
-    location: mockUser.location,
-    bio: mockUser.bio,
-  })
+  const [loading, setLoading] = useState(true)
+  const [saving, setSaving] = useState(false)
+  const [error, setError] = useState<string | null>(null)
+  const [user, setUser] = useState<{ name: string; email: string } | null>(null)
+  const [projectCount, setProjectCount] = useState(0)
+  const [editForm, setEditForm] = useState({ name: '', email: '' })
+
+  const [passwordForm, setPasswordForm] = useState({ currentPassword: '', newPassword: '', confirmPassword: '' })
+  const [passwordError, setPasswordError] = useState<string | null>(null)
+  const [passwordSaving, setPasswordSaving] = useState(false)
+
+  useEffect(() => {
+    setLoading(true)
+    Promise.all([
+      api.auth.getMe(),
+      api.projects.getAll(),
+    ])
+      .then(([userData, projects]) => {
+        setUser({ name: userData.name, email: userData.email })
+        setEditForm({ name: userData.name, email: userData.email })
+        setProjectCount(projects.length)
+      })
+      .catch(err => setError(err instanceof Error ? err.message : 'Failed to load profile'))
+      .finally(() => setLoading(false))
+  }, [])
+
+  const handleSaveProfile = async () => {
+    setSaving(true)
+    setError(null)
+    try {
+      const updated = await api.auth.updateProfile({ name: editForm.name })
+      setUser({ name: updated.name, email: updated.email })
+      setIsEditing(false)
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Failed to update profile')
+    } finally {
+      setSaving(false)
+    }
+  }
+
+  const handleChangePassword = async () => {
+    setPasswordError(null)
+    if (!passwordForm.currentPassword || !passwordForm.newPassword) {
+      setPasswordError('Please fill in all fields')
+      return
+    }
+    if (passwordForm.newPassword !== passwordForm.confirmPassword) {
+      setPasswordError('New passwords do not match')
+      return
+    }
+    if (passwordForm.newPassword.length < 6) {
+      setPasswordError('New password must be at least 6 characters')
+      return
+    }
+    setPasswordSaving(true)
+    try {
+      await api.auth.changePassword({
+        currentPassword: passwordForm.currentPassword,
+        newPassword: passwordForm.newPassword,
+      })
+      setPasswordForm({ currentPassword: '', newPassword: '', confirmPassword: '' })
+    } catch (err) {
+      setPasswordError(err instanceof Error ? err.message : 'Failed to change password')
+    } finally {
+      setPasswordSaving(false)
+    }
+  }
 
   const tabs = [
     { id: 'overview', label: 'Overview', icon: User },
@@ -84,28 +108,37 @@ export function ProfilePage() {
     { id: 'edit', label: 'Edit Profile', icon: Settings },
   ]
 
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center min-h-[60vh]">
+        <div className="text-center">
+          <Loader2 className="w-8 h-8 animate-spin text-accent mx-auto" />
+          <p className="mt-3 text-sm text-fg-2">Loading profile...</p>
+        </div>
+      </div>
+    )
+  }
+
+  const displayName = user?.name || 'User'
+  const displayEmail = user?.email || ''
+  const memberSince = 'January 2024'
+  const initials = displayName.split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2)
+
   return (
     <div className="space-y-6 animate-fade-in max-w-4xl">
+      {error && (
+        <div className="p-3 bg-error-bg/20 border border-error/30 rounded-lg text-sm text-error">{error}</div>
+      )}
+
       {/* Profile Header */}
       <Card variant="elevated" className="p-5">
         <div className="flex flex-col md:flex-row md:items-center gap-6">
           <div className="relative">
             <Avatar
               size="xl"
-              fallback={mockUser.name.split(' ').map(n => n[0]).join('')}
-              src={mockUser.avatar}
+              fallback={initials}
               className="bg-accent-bg text-accent ring-4 ring-bg-0"
             />
-            {isEditing && (
-              <Button
-                variant="ghost"
-                size="sm"
-                className="absolute bottom-0 right-0 bg-bg-0"
-                onClick={() => {}}
-              >
-                <Camera className="w-4 h-4" />
-              </Button>
-            )}
           </div>
 
           <div className="flex-1 text-center md:text-left">
@@ -118,7 +151,6 @@ export function ProfilePage() {
                 />
                 <Input
                   value={editForm.email}
-                  onChange={e => setEditForm({ ...editForm, email: e.target.value })}
                   type="email"
                   className="text-center md:text-left bg-transparent border-0 focus:ring-0 text-fg-2"
                   disabled
@@ -126,23 +158,19 @@ export function ProfilePage() {
               </div>
             ) : (
               <>
-                <h1 className="text-2xl font-semibold text-fg-0">{mockUser.name}</h1>
-                <p className="text-fg-1">{mockUser.email}</p>
+                <h1 className="text-2xl font-semibold text-fg-0">{displayName}</h1>
+                <p className="text-fg-1">{displayEmail}</p>
               </>
             )}
             <div className="flex items-center justify-center md:justify-start gap-4 mt-3 text-sm text-fg-2">
               <span className="flex items-center gap-1">
                 <Badge variant="default" size="sm" className="bg-accent-bg text-accent">
-                  {mockUser.role}
+                  Data Analyst
                 </Badge>
               </span>
               <span className="flex items-center gap-1">
                 <Calendar className="w-3.5 h-3.5" />
-                Member since {mockUser.memberSince}
-              </span>
-              <span className="flex items-center gap-1">
-                <MapPin className="w-3.5 h-3.5" />
-                {mockUser.location}
+                Member since {memberSince}
               </span>
             </div>
           </div>
@@ -150,12 +178,12 @@ export function ProfilePage() {
           <div className="flex items-center gap-3">
             {isEditing ? (
               <>
-                <Button variant="outline" onClick={() => { setIsEditing(false); setEditForm({ name: mockUser.name, email: mockUser.email, location: mockUser.location, bio: mockUser.bio }); }}>
+                <Button variant="outline" onClick={() => { setIsEditing(false); setEditForm({ name: displayName, email: displayEmail }); }}>
                   <X className="w-4 h-4 mr-1" />
                   Cancel
                 </Button>
-                <Button onClick={() => { /* save */ setIsEditing(false); }}>
-                  <Save className="w-4 h-4 mr-1" />
+                <Button onClick={handleSaveProfile} disabled={saving}>
+                  {saving ? <Loader2 className="w-4 h-4 mr-1 animate-spin" /> : <Save className="w-4 h-4 mr-1" />}
                   Save
                 </Button>
               </>
@@ -167,39 +195,15 @@ export function ProfilePage() {
             )}
           </div>
         </div>
-
-        {!isEditing && mockUser.bio && (
-          <div className="mt-6 pt-6 border-t border-border-1">
-            <p className="text-fg-1">{mockUser.bio}</p>
-          </div>
-        )}
-
-        {isEditing && (
-          <div className="mt-6">
-            <Textarea
-              value={editForm.bio}
-              onChange={e => setEditForm({ ...editForm, bio: e.target.value })}
-              placeholder="Tell us about yourself..."
-              rows={3}
-            />
-            <div className="flex gap-2 mt-2">
-              <Input
-                value={editForm.location}
-                onChange={e => setEditForm({ ...editForm, location: e.target.value })}
-                placeholder="Location"
-              />
-            </div>
-          </div>
-        )}
       </Card>
 
       {/* Stats Cards */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
         {[
-          { label: 'Projects', value: mockUser.stats.projects, icon: FolderKanban, color: 'text-data-2', trend: '+3 this month' },
-          { label: 'Datasets', value: mockUser.stats.datasets, icon: FileSpreadsheet, color: 'text-data-1', trend: '+8 this week' },
-          { label: 'AI Questions', value: mockUser.stats.questions, icon: MessageSquare, color: 'text-data-4', trend: '+42 today' },
-          { label: 'Insights', value: mockUser.stats.insights.toLocaleString(), icon: Lightbulb, color: 'text-data-3', trend: '+156 this week' },
+          { label: 'Projects', value: projectCount, icon: FolderKanban, color: 'text-data-2' },
+          { label: 'Datasets', value: projectCount, icon: FileSpreadsheet, color: 'text-data-1' },
+          { label: 'AI Questions', value: 0, icon: MessageSquare, color: 'text-data-4' },
+          { label: 'Insights', value: 0, icon: Lightbulb, color: 'text-data-3' },
         ].map((stat, i) => (
           <motion.div
             key={stat.label}
@@ -217,7 +221,6 @@ export function ProfilePage() {
                 <stat.icon className="w-6 h-6" />
               </div>
             </div>
-            <p className="text-xs text-fg-3 mt-2">{stat.trend}</p>
           </motion.div>
         ))}
       </div>
@@ -281,30 +284,6 @@ export function ProfilePage() {
                   </Button>
                 </CardContent>
               </Card>
-
-              <Card>
-                <CardHeader>
-                  <CardTitle className="flex items-center gap-2">
-                    <Star className="w-5 h-5 text-warning" />
-                    Favorite Projects
-                  </CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <div className="space-y-3">
-                    {['Sales Analysis Q1 2026', 'Marketing Campaign ROI', 'Customer Churn Prediction'].map((proj, i) => (
-                      <div key={i} className="flex items-center justify-between p-3 bg-bg-2 rounded-lg">
-                        <div className="flex items-center gap-3">
-                          <div className="w-8 h-8 rounded-lg bg-accent-bg text-accent flex items-center justify-center">
-                            <Star className="w-4 h-4 fill-current" />
-                          </div>
-                          <span className="font-medium text-fg-0">{proj}</span>
-                        </div>
-                        <Button variant="ghost" size="sm">Open</Button>
-                      </div>
-                    ))}
-                  </div>
-                </CardContent>
-              </Card>
             </div>
           </motion.div>
         )}
@@ -312,28 +291,9 @@ export function ProfilePage() {
         {activeTab === 'activity' && (
           <motion.div key="activity" initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -10 }}>
             <Card className="p-0">
-              <div className="divide-y divide-border-1">
-                {mockUser.recentActivity.map((activity, i) => {
-                  const Icon = activity.icon
-                  return (
-                    <motion.div
-                      key={activity.id}
-                      initial={{ opacity: 0, x: -20 }}
-                      animate={{ opacity: 1, x: 0 }}
-                      transition={{ delay: i * 0.03 }}
-                      className="p-4 flex items-center gap-4 hover:bg-bg-1 transition-colors"
-                    >
-                      <div className={cn('w-10 h-10 rounded-lg flex items-center justify-center flex-shrink-0', activity.color)}>
-                        <Icon className="w-5 h-5" />
-                      </div>
-                      <div className="flex-1 min-w-0">
-                        <p className="text-sm font-medium text-fg-0">{activity.title}</p>
-                        <p className="text-xs text-fg-2">{activity.time}</p>
-                      </div>
-                      <span className="text-xs text-fg-3 capitalize">{activity.type}</span>
-                    </motion.div>
-                  )
-                })}
+              <div className="p-6 text-center">
+                <Clock className="w-8 h-8 text-fg-3 mx-auto mb-2" />
+                <p className="text-fg-2">Activity history will appear here.</p>
               </div>
             </Card>
           </motion.div>
@@ -342,11 +302,18 @@ export function ProfilePage() {
         {activeTab === 'achievements' && (
           <motion.div key="achievements" initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -10 }}>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-              {mockUser.achievements.map((achievement, i) => {
+              {[
+                { name: 'Data Explorer', description: 'Analyzed 10+ datasets', icon: Search, earned: projectCount >= 10 },
+                { name: 'Insight Generator', description: 'Generated 100+ AI insights', icon: Lightbulb, earned: false },
+                { name: 'Quality Champion', description: 'Fixed 50+ data quality issues', icon: Shield, earned: false },
+                { name: 'Visualization Pro', description: 'Created 20+ dashboards', icon: BarChart3, earned: false },
+                { name: 'AI Conversationalist', description: 'Asked 200+ questions to AI', icon: MessageSquare, earned: false },
+                { name: 'Project Master', description: 'Completed 15 projects', icon: Award, earned: projectCount >= 15 },
+              ].map((achievement, i) => {
                 const Icon = achievement.icon
                 return (
                   <motion.div
-                    key={achievement.id}
+                    key={achievement.name}
                     initial={{ opacity: 0, scale: 0.95 }}
                     animate={{ opacity: 1, scale: 1 }}
                     transition={{ delay: i * 0.05 }}
@@ -383,7 +350,7 @@ export function ProfilePage() {
             <Card>
               <CardHeader>
                 <CardTitle>Edit Profile</CardTitle>
-                <CardDescription>Update your personal information and preferences</CardDescription>
+                <CardDescription>Update your personal information</CardDescription>
               </CardHeader>
               <CardContent className="space-y-6">
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -401,36 +368,63 @@ export function ProfilePage() {
                       id="email"
                       type="email"
                       value={editForm.email}
-                      onChange={e => setEditForm({ ...editForm, email: e.target.value })}
                       disabled
                     />
                   </div>
-                  <div>
-                    <Label htmlFor="location">Location</Label>
-                    <Input
-                      id="location"
-                      value={editForm.location}
-                      onChange={e => setEditForm({ ...editForm, location: e.target.value })}
-                      placeholder="City, Country"
-                    />
-                  </div>
-                </div>
-                <div>
-                  <Label htmlFor="bio">Bio</Label>
-                  <Textarea
-                    id="bio"
-                    value={editForm.bio}
-                    onChange={e => setEditForm({ ...editForm, bio: e.target.value })}
-                    placeholder="Tell us about yourself..."
-                    rows={4}
-                  />
                 </div>
                 <div className="flex justify-end gap-3 pt-4 border-t border-border-1">
                   <Button variant="outline" onClick={() => { setIsEditing(false); setActiveTab('overview'); }}>
                     Cancel
                   </Button>
-                  <Button onClick={() => { /* save */ setIsEditing(false); setActiveTab('overview'); }}>
+                  <Button onClick={handleSaveProfile} disabled={saving}>
+                    {saving ? <Loader2 className="w-4 h-4 mr-1 animate-spin" /> : <Save className="w-4 h-4 mr-1" />}
                     Save Changes
+                  </Button>
+                </div>
+              </CardContent>
+            </Card>
+
+            {/* Change Password Card */}
+            <Card className="mt-6">
+              <CardHeader>
+                <CardTitle>Change Password</CardTitle>
+                <CardDescription>Update your account password</CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                {passwordError && (
+                  <div className="p-3 bg-error-bg/20 border border-error/30 rounded-lg text-sm text-error">{passwordError}</div>
+                )}
+                <div>
+                  <Label htmlFor="currentPassword">Current Password</Label>
+                  <Input
+                    id="currentPassword"
+                    type="password"
+                    value={passwordForm.currentPassword}
+                    onChange={e => setPasswordForm({ ...passwordForm, currentPassword: e.target.value })}
+                  />
+                </div>
+                <div>
+                  <Label htmlFor="newPassword">New Password</Label>
+                  <Input
+                    id="newPassword"
+                    type="password"
+                    value={passwordForm.newPassword}
+                    onChange={e => setPasswordForm({ ...passwordForm, newPassword: e.target.value })}
+                  />
+                </div>
+                <div>
+                  <Label htmlFor="confirmPassword">Confirm New Password</Label>
+                  <Input
+                    id="confirmPassword"
+                    type="password"
+                    value={passwordForm.confirmPassword}
+                    onChange={e => setPasswordForm({ ...passwordForm, confirmPassword: e.target.value })}
+                  />
+                </div>
+                <div className="flex justify-end">
+                  <Button onClick={handleChangePassword} disabled={passwordSaving}>
+                    {passwordSaving ? <Loader2 className="w-4 h-4 mr-1 animate-spin" /> : <Key className="w-4 h-4 mr-1" />}
+                    Update Password
                   </Button>
                 </div>
               </CardContent>
@@ -439,5 +433,15 @@ export function ProfilePage() {
         )}
       </AnimatePresence>
     </div>
+  )
+}
+
+function Key(props: React.SVGProps<SVGSVGElement>) {
+  return (
+    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...props}>
+      <path d="m15.5 7.5 2.3 2.3a1 1 0 0 0 1.4 0l2.1-2.1a1 1 0 0 0 0-1.4L19 4" />
+      <path d="m21 2-9.6 9.6" />
+      <circle cx="7.5" cy="15.5" r="5.5" />
+    </svg>
   )
 }
